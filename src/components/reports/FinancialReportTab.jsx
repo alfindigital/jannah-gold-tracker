@@ -182,7 +182,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
   };
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-4 pb-2">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-display font-extrabold text-[#1B1814] tracking-tight">

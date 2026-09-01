@@ -40,7 +40,7 @@ export default function App() {
       <Header />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-md w-full mx-auto px-4 pt-4 pb-24">
+      <main className="flex-1 max-w-md w-full mx-auto px-4 pt-3 pb-16">
         {/* 1. Dashboard */}
         {activeTab === 'dashboard' && (
           <DashboardTab 

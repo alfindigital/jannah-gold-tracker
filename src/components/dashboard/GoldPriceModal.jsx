@@ -43,7 +43,7 @@ export default function GoldPriceModal({ isOpen, onClose }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Benchmark Harga Emas">
+    <Modal isOpen={isOpen} onClose={onClose} title="Harga Emas Acuan">
       <form onSubmit={handleSave} className="space-y-3.5 text-xs">
         <p className="text-[#8A816F] text-[11px] leading-relaxed">
           Harga acuan per gram ini digunakan sebagai dasar kalkulasi valuasi stok aktif Anda.

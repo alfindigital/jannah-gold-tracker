@@ -93,7 +93,7 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
   };
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-4 pb-2">
       {/* Top Segment Tabs: Ringkasan | Laba Rugi | Neraca */}
       <div className="grid grid-cols-3 p-1.5 bg-[#EAE2D2] rounded-2xl font-display font-bold text-xs border border-[#DDD3BF]">
         <button
@@ -313,7 +313,7 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
           <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-3 shadow-xs">
             <div className="flex items-center justify-between">
               <h2 className="text-xs font-display font-bold uppercase tracking-wider text-[#1B1814]">
-                Benchmark Harga Emas
+                Harga Emas
               </h2>
               <button
                 onClick={onOpenPriceModal}
