@@ -527,7 +527,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
 
                     <div className="text-right">
                       <div className="text-xs font-mono font-extrabold text-[#1E5C27] tabular-nums">
-                        +{formatRupiah(tx.netProfit)}
+                        +{formatRupiahJuta(tx.netProfit)}
                       </div>
                       <div className="text-[10px] text-[#8A816F] font-mono">Laba Bersih</div>
                     </div>
@@ -535,7 +535,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
 
                   <div className="pt-2 border-t border-[#E5DFD3] flex items-center justify-between text-xs">
                     <div className="text-[11px] text-[#7A7264] font-mono tabular-nums">
-                      Terjual: {formatRupiah(tx.sellPrice)} | Modal: {formatRupiah(tx.costPrice)}
+                      Terjual: {formatRupiahJuta(tx.sellPrice)} | Modal: {formatRupiahJuta(tx.costPrice)}
                     </div>
                     {tx.customerPhone && (
                       <button

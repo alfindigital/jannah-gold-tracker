@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, STATUS } from '../../db/db';
-import { formatRupiah, formatGram, formatDateIndo } from '../../services/calculationService';
+import { formatRupiah, formatRupiahJuta, formatGram, formatDateIndo } from '../../services/calculationService';
 import { 
   Plus, 
   Search, 
@@ -178,7 +178,7 @@ export default function InventoryTab({ onQuickSell }) {
                 <div className="text-right">
                   <div className="text-[10px] text-[#8A816F] font-mono">MODAL</div>
                   <div className="text-xs font-mono font-bold text-[#1B1814] tabular-nums">
-                    {formatRupiah(item.totalBuyPrice)}
+                    {formatRupiahJuta(item.totalBuyPrice)}
                   </div>
                 </div>
               </div>

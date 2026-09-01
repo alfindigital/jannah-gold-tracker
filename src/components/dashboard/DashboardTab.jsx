@@ -240,7 +240,7 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
                     <div className="text-right">
                       <Badge status={item.status} />
                       <div className="text-xs font-mono font-bold text-[#1B1814] mt-1 tabular-nums">
-                        {formatRupiah(item.totalBuyPrice)}
+                        {formatRupiahJuta(item.totalBuyPrice)}
                       </div>
                     </div>
                   </div>
@@ -300,7 +300,7 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
 
                     {item.targetAmount > 0 && (
                       <div className="text-right font-mono font-bold text-xs text-[#1B1814] tabular-nums">
-                        {formatRupiah(item.targetAmount)}
+                        {formatRupiahJuta(item.targetAmount)}
                       </div>
                     )}
                   </div>

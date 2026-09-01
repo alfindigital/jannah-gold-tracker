@@ -23,14 +23,14 @@ export function formatJuta(amount) {
     const inJt = num / 1000000;
     const formatted = inJt.toLocaleString('id-ID', {
       minimumFractionDigits: 0,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 3
     });
     return `${formatted} jt`;
   } else if (Math.abs(num) >= 1000) {
     const inRb = num / 1000;
     const formatted = inRb.toLocaleString('id-ID', {
       minimumFractionDigits: 0,
-      maximumFractionDigits: 1
+      maximumFractionDigits: 2
     });
     return `${formatted} rb`;
   }
@@ -44,14 +44,14 @@ export function formatRupiahJuta(amount) {
     const inJt = num / 1000000;
     const formatted = inJt.toLocaleString('id-ID', {
       minimumFractionDigits: 0,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 3
     });
     return `Rp ${formatted} jt`;
   } else if (Math.abs(num) >= 1000) {
     const inRb = num / 1000;
     const formatted = inRb.toLocaleString('id-ID', {
       minimumFractionDigits: 0,
-      maximumFractionDigits: 1
+      maximumFractionDigits: 2
     });
     return `Rp ${formatted} rb`;
   }
@@ -67,7 +67,6 @@ export function formatGram(gram) {
 export function formatDateIndo(dateStr) {
   if (!dateStr) return '-';
   try {
-    // If it's YYYY-MM-DD string, parse directly to avoid timezone shift
     if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
       const parts = dateStr.split('T')[0].split('-');
       const year = parts[0].slice(-2);

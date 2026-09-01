@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, SCHEDULE_TYPE, SCHEDULE_STATUS } from '../../db/db';
-import { formatRupiah, formatDateTimeIndo, getCleanPhoneNumber } from '../../services/calculationService';
+import { formatRupiah, formatRupiahJuta, formatDateTimeIndo, getCleanPhoneNumber } from '../../services/calculationService';
 import { 
   Plus, 
   MapPin, 
@@ -183,7 +183,7 @@ export default function ScheduleTab() {
                         {item.type === SCHEDULE_TYPE.KULAKAN ? 'BUDGET' : 'NOMINAL'}
                       </div>
                       <div className="text-xs font-mono font-extrabold text-[#1B1814] tabular-nums">
-                        {formatRupiah(item.targetAmount)}
+                        {formatRupiahJuta(item.targetAmount)}
                       </div>
                     </div>
                   )}
