@@ -1,473 +1,460 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db, STATUS } from '../../db/db';
-import { formatRupiah, formatGram, formatDateIndo, calculateNetProfit, getCleanPhoneNumber } from '../../services/calculationService';
+import { db } from '../../db/db';
 import { 
+  Users, 
+  Search, 
   Plus, 
   MessageSquare, 
-  ArrowRightLeft, 
-  Users,
-  UserPlus
+  MapPin, 
+  ShoppingBag, 
+  ChevronDown, 
+  ChevronUp, 
+  Trash2, 
+  Edit3, 
+  Phone
 } from 'lucide-react';
 import Modal from '../common/Modal';
+import { 
+  formatRupiah, 
+  formatRupiahJuta, 
+  formatGram, 
+  formatDateIndo 
+} from '../../services/calculationService';
 
-export default function CrmTab({ quickSellItem, onClearQuickSell }) {
-  const [subTab, setSubTab] = useState('sales');
-  const [showSaleModal, setShowSaleModal] = useState(false);
-  const [showCustomerModal, setShowCustomerModal] = useState(false);
+export default function CrmTab() {
+  const customers = useLiveQuery(() => db.customers.toArray()) || [];
+  const transactions = useLiveQuery(() => db.transactions.toArray()) || [];
 
-  const transactions = useLiveQuery(() => db.transactions.toArray(), []) || [];
-  const customers = useLiveQuery(() => db.customers.toArray(), []) || [];
-  const inventory = useLiveQuery(() => db.inventory.toArray(), []) || [];
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState('all'); // 'all' | 'vip' | 'regular' | 'new'
+  const [expandedCustId, setExpandedCustId] = useState(null);
+  
+  // Modals
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
-  const readyItems = inventory.filter(item => item.status === STATUS.READY);
-
-  const [saleForm, setSaleForm] = useState({
-    inventoryId: '',
-    customerId: '',
-    customerName: '',
-    customerPhone: '',
-    saleDate: new Date().toISOString().split('T')[0],
-    sellPrice: 0,
-    operationalFee: 0,
-    paymentMethod: 'Cash COD',
-    notes: ''
-  });
-
-  const [custForm, setCustForm] = useState({
+  // Form State
+  const [formData, setFormData] = useState({
     name: '',
     phone: '',
     address: '',
     notes: ''
   });
 
-  useEffect(() => {
-    if (quickSellItem) {
-      setSaleForm({
-        inventoryId: quickSellItem.id,
-        customerId: '',
-        customerName: '',
-        customerPhone: '',
-        saleDate: new Date().toISOString().split('T')[0],
-        sellPrice: (quickSellItem.totalBuyPrice || 0) + 75000,
-        operationalFee: 15000,
-        paymentMethod: 'Cash COD',
-        notes: ''
-      });
-      setShowSaleModal(true);
-      onClearQuickSell();
+  // 3s Auto-reset for delete confirmation
+  React.useEffect(() => {
+    if (confirmDeleteId !== null) {
+      const timer = setTimeout(() => {
+        setConfirmDeleteId(null);
+      }, 3000);
+      return () => clearTimeout(timer);
     }
-  }, [quickSellItem]);
+  }, [confirmDeleteId]);
 
-  const selectedInventoryItem = inventory.find(i => i.id === Number(saleForm.inventoryId));
-  const currentCost = selectedInventoryItem ? Number(selectedInventoryItem.totalBuyPrice) : 0;
-  const currentWeight = selectedInventoryItem ? Number(selectedInventoryItem.weight) : 0;
-  const profitMetrics = calculateNetProfit(saleForm.sellPrice, currentCost, saleForm.operationalFee);
+  // Merge customer with their calculated transaction metrics
+  const customerList = useMemo(() => {
+    return customers.map(c => {
+      // Find all transactions for this customer (by ID or normalized name)
+      const custTxs = transactions.filter(t => 
+        (t.customerId && t.customerId === c.id) || 
+        (t.customerName && t.customerName.trim().toLowerCase() === c.name.trim().toLowerCase())
+      ).sort((a, b) => new Date(b.saleDate) - new Date(a.saleDate));
 
-  const handleSaveSale = async (e) => {
-    e.preventDefault();
-    if (!selectedInventoryItem) {
-      alert('Please select a gold item to sell');
+      const totalLtv = custTxs.reduce((acc, t) => acc + (Number(t.sellPrice) || 0), 0);
+      const totalGrams = custTxs.reduce((acc, t) => acc + (Number(t.weight) || 0), 0);
+      const totalOrders = custTxs.length;
+      const lastOrderDate = custTxs[0]?.saleDate || null;
+      const lastLocation = custTxs[0]?.deliveryLocation || custTxs[0]?.location || c.address || '-';
+
+      return {
+        ...c,
+        txList: custTxs,
+        ltv: totalLtv,
+        totalGrams,
+        totalOrders,
+        lastOrderDate,
+        lastLocation
+      };
+    });
+  }, [customers, transactions]);
+
+  // Filter & Search
+  const filteredCustomers = useMemo(() => {
+    return customerList.filter(c => {
+      // Search
+      const matchSearch = 
+        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (c.phone && c.phone.includes(searchQuery)) ||
+        (c.address && c.address.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (c.notes && c.notes.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      if (!matchSearch) return false;
+
+      // Filter pills
+      if (filterType === 'vip') return c.totalOrders >= 3;
+      if (filterType === 'regular') return c.totalOrders === 2;
+      if (filterType === 'new') return c.totalOrders <= 1;
+
+      return true;
+    }).sort((a, b) => b.ltv - a.ltv); // Default: Highest LTV first
+  }, [customerList, searchQuery, filterType]);
+
+  const openWhatsApp = (phone, name = '') => {
+    if (!phone) {
+      alert('Nomor WhatsApp belum diisi');
       return;
     }
+    const cleanPhone = phone.replace(/\D/g, '').replace(/^0/, '62');
+    const greeting = encodeURIComponent(`Halo ${name || ''}, salam dari Jannah Gold...`);
+    window.open(`https://wa.me/${cleanPhone}?text=${greeting}`, '_blank');
+  };
 
-    let customerId = saleForm.customerId ? Number(saleForm.customerId) : null;
-    let customerName = saleForm.customerName;
-    let customerPhone = saleForm.customerPhone;
+  const handleOpenAdd = () => {
+    setEditingCustomer(null);
+    setFormData({ name: '', phone: '', address: '', notes: '' });
+    setShowAddModal(true);
+  };
 
-    if (customerId) {
-      const cust = customers.find(c => c.id === customerId);
-      if (cust) {
-        customerName = cust.name;
-        customerPhone = cust.phone;
-        await db.customers.update(customerId, {
-          totalTransactions: (cust.totalTransactions || 0) + 1,
-          totalGramsBought: (cust.totalGramsBought || 0) + currentWeight
-        });
-      }
-    } else if (customerName) {
-      customerId = await db.customers.add({
-        name: customerName,
-        phone: customerPhone || '',
-        address: '',
-        totalTransactions: 1,
-        totalGramsBought: currentWeight,
-        notes: 'Created automatically from sale',
-        createdAt: new Date().toISOString()
-      });
-    }
-
-    await db.transactions.add({
-      inventoryId: selectedInventoryItem.id,
-      itemTitle: selectedInventoryItem.title,
-      weight: currentWeight,
-      customerId: customerId,
-      customerName: customerName || 'Customer',
-      customerPhone: customerPhone || '',
-      saleDate: saleForm.saleDate,
-      costPrice: currentCost,
-      sellPrice: Number(saleForm.sellPrice),
-      operationalFee: Number(saleForm.operationalFee) || 0,
-      grossProfit: profitMetrics.grossProfit,
-      netProfit: profitMetrics.netProfit,
-      paymentMethod: saleForm.paymentMethod,
-      notes: saleForm.notes,
-      createdAt: new Date().toISOString()
+  const handleOpenEdit = (cust) => {
+    setEditingCustomer(cust);
+    setFormData({
+      name: cust.name || '',
+      phone: cust.phone || '',
+      address: cust.address || '',
+      notes: cust.notes || ''
     });
-
-    await db.inventory.update(selectedInventoryItem.id, {
-      status: STATUS.SOLD
-    });
-
-    setShowSaleModal(false);
+    setShowAddModal(true);
   };
 
   const handleSaveCustomer = async (e) => {
     e.preventDefault();
-    await db.customers.add({
-      name: custForm.name,
-      phone: custForm.phone,
-      address: custForm.address,
-      totalTransactions: 0,
-      totalGramsBought: 0,
-      notes: custForm.notes,
-      createdAt: new Date().toISOString()
-    });
-    setCustForm({ name: '', phone: '', address: '', notes: '' });
-    setShowCustomerModal(false);
+    if (!formData.name.trim()) return;
+
+    if (editingCustomer) {
+      await db.customers.update(editingCustomer.id, {
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        address: formData.address.trim(),
+        notes: formData.notes.trim()
+      });
+    } else {
+      await db.customers.add({
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        address: formData.address.trim(),
+        notes: formData.notes.trim(),
+        totalTransactions: 0,
+        totalGramsBought: 0,
+        createdAt: new Date().toISOString()
+      });
+    }
+
+    setShowAddModal(false);
+    setEditingCustomer(null);
   };
 
-  const openWhatsApp = (phone, name = '') => {
-    const cleanPhone = getCleanPhoneNumber(phone);
-    if (!cleanPhone) {
-      alert('WhatsApp number is empty');
-      return;
+  const handleDeleteCustomer = async (id) => {
+    if (confirmDeleteId === id) {
+      await db.customers.delete(id);
+      setConfirmDeleteId(null);
+    } else {
+      setConfirmDeleteId(id);
     }
-    const greeting = encodeURIComponent(
-      `Hello ${name || ''}, greetings from Jannah Gold...`
-    );
-    window.open(`https://wa.me/${cleanPhone}?text=${greeting}`, '_blank');
   };
 
   return (
-    <div className="space-y-4 pb-20">
-      {/* Subnav & Action */}
-      <div className="flex items-center justify-between">
-        <div className="flex bg-[#EBE5D8] p-1 rounded-2xl">
-          <button
-            onClick={() => setSubTab('sales')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-display font-bold transition-all ${
-              subTab === 'sales'
-                ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
-                : 'text-[#7A7264] hover:text-[#1B1814]'
-            }`}
-          >
-            Sales ({transactions.length})
-          </button>
-          <button
-            onClick={() => setSubTab('customers')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-display font-bold transition-all ${
-              subTab === 'customers'
-                ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
-                : 'text-[#7A7264] hover:text-[#1B1814]'
-            }`}
-          >
-            Customers ({customers.length})
-          </button>
+    <div className="space-y-4 pb-2">
+      {/* 1 Single Top Row: Filters on Left, + Button on Right */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+          {[
+            { id: 'all', label: 'Semua' },
+            { id: 'vip', label: 'VIP (≥3x)' },
+            { id: 'regular', label: 'Langganan (2x)' },
+            { id: 'new', label: 'Baru (1x)' }
+          ].map(f => (
+            <button
+              key={f.id}
+              onClick={() => setFilterType(f.id)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-display font-bold transition-all whitespace-nowrap ${
+                filterType === f.id
+                  ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+                  : 'bg-[#FAF8F5] text-[#7A7264] border border-[#E5DFD3] hover:bg-[#F2EDE2]'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
         </div>
 
-        <div>
-          {subTab === 'sales' ? (
-            <button
-              onClick={() => setShowSaleModal(true)}
-              className="flex items-center gap-1.5 bg-[#1B1814] text-[#FAF8F5] px-3.5 py-2 rounded-2xl text-xs font-display font-bold hover:bg-[#2E2820] active-press transition-all shadow-sm ring-1 ring-[#C59A3F]/30"
-            >
-              <Plus className="w-4 h-4 stroke-[2.5] text-[#DFC28F]" />
-              <span>Sell</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowCustomerModal(true)}
-              className="flex items-center gap-1.5 bg-[#1B1814] text-[#FAF8F5] px-3.5 py-2 rounded-2xl text-xs font-display font-bold hover:bg-[#2E2820] active-press transition-all shadow-sm ring-1 ring-[#C59A3F]/30"
-            >
-              <UserPlus className="w-4 h-4 stroke-[2.5] text-[#DFC28F]" />
-              <span>Customer</span>
-            </button>
-          )}
-        </div>
+        <button
+          onClick={handleOpenAdd}
+          className="w-8 h-8 rounded-xl bg-[#1B1814] text-[#E5C378] flex items-center justify-center hover:bg-[#2E2820] active-press transition-all shadow-xs ring-1 ring-[#D4AF37]/50 shrink-0"
+          title="Tambah Pelanggan"
+        >
+          <Plus className="w-4 h-4 stroke-[2.8]" />
+        </button>
       </div>
 
-      {/* 1. Sales Transactions */}
-      {subTab === 'sales' && (
-        <div className="space-y-2.5">
-          {transactions.length === 0 ? (
-            <div className="p-8 text-center rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] text-[#8A816F]">
-              <ArrowRightLeft className="w-8 h-8 mx-auto mb-2 text-[#C7BC9F]" />
-              <div className="text-xs font-mono">No transaction history yet</div>
-            </div>
-          ) : (
-            transactions.map((tx) => (
-              <div
-                key={tx.id}
-                className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-2.5 shadow-xs"
+      {/* Search Bar */}
+      <div className="relative">
+        <Search className="w-4 h-4 text-[#8A816F] absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          placeholder="Cari nama, WhatsApp, kota/alamat..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-3.5 py-2.5 bg-[#FAF8F5] border border-[#E5DFD3] rounded-2xl text-xs text-[#1B1814] placeholder-[#8A816F] focus:outline-none focus:border-[#C59A3F] transition-colors shadow-xs"
+        />
+      </div>
+
+      {/* Customer Cards List */}
+      <div className="space-y-3">
+        {filteredCustomers.length === 0 ? (
+          <div className="p-8 text-center bg-[#FAF8F5] border border-[#E5DFD3] rounded-3xl space-y-2">
+            <Users className="w-8 h-8 text-[#8A816F] mx-auto stroke-[1.5]" />
+            <div className="text-xs font-display font-bold text-[#1B1814]">Belum Ada Data Pelanggan</div>
+            <p className="text-[11px] text-[#8A816F]">
+              Data pembeli akan otomatis tercatat saat Anda mencatat transaksi penjualan.
+            </p>
+          </div>
+        ) : (
+          filteredCustomers.map(c => {
+            const isExpanded = expandedCustId === c.id;
+
+            return (
+              <div 
+                key={c.id} 
+                className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-3 shadow-xs hover:border-[#D4AF37]/50 transition-all"
               >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-display font-bold text-[#1B1814]">{tx.itemTitle}</span>
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#EFECE3] text-[#3D3528] rounded-md">
-                        {formatGram(tx.weight)}
-                      </span>
+                {/* Header Row: Name & Badges & Actions */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-display font-black text-sm text-[#1B1814] tracking-tight">
+                        {c.name}
+                      </h3>
+                      {c.totalOrders >= 3 ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#FAF2DA] text-[#946F22] border border-[#E6CD85]">
+                          ★ VIP Emas
+                        </span>
+                      ) : c.totalOrders === 2 ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#EAF3EA] text-[#1E5C27] border border-[#C2E0C7]">
+                          Langganan (2x)
+                        </span>
+                      ) : c.totalOrders === 1 ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono text-[#7A7264] bg-[#F2EDE2] border border-[#E5DFD3]">
+                          1x Beli
+                        </span>
+                      ) : null}
                     </div>
-                    <div className="text-[11px] text-[#7A7264] mt-1 flex items-center gap-2 font-mono">
-                      <span className="font-bold text-[#1B1814]">{tx.customerName}</span>
-                      <span>•</span>
-                      <span>{formatDateIndo(tx.saleDate)}</span>
+
+                    <div className="flex items-center gap-2 text-[11px] font-mono text-[#7A7264]">
+                      {c.phone ? (
+                        <span className="flex items-center gap-1 text-[#1B1814] font-bold">
+                          <Phone className="w-3 h-3 text-[#A27B2C]" />
+                          {c.phone}
+                        </span>
+                      ) : (
+                        <span>Tanpa WhatsApp</span>
+                      )}
+                      {c.address && (
+                        <>
+                          <span>•</span>
+                          <span className="flex items-center gap-0.5 truncate max-w-[150px]">
+                            <MapPin className="w-3 h-3 text-[#A27B2C] shrink-0" />
+                            {c.address}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
 
-                  <div className="text-right">
-                    <div className="text-xs font-mono font-extrabold text-[#1E5C27] tabular-nums">
-                      +{formatRupiah(tx.netProfit)}
-                    </div>
-                    <div className="text-[10px] text-[#8A816F] font-mono">Net Profit</div>
-                  </div>
-                </div>
+                  {/* Actions: WA, Edit, Delete */}
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {c.phone && (
+                      <button
+                        onClick={() => openWhatsApp(c.phone, c.name)}
+                        className="p-2 text-[#1E5C27] bg-[#EAF3EA] hover:bg-[#D8EBD9] border border-[#C2E0C7] rounded-xl active-press transition-all"
+                        title="Chat WhatsApp"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 stroke-[2.2]" />
+                      </button>
+                    )}
 
-                <div className="pt-2 border-t border-[#E5DFD3] flex items-center justify-between text-xs">
-                  <div className="text-[11px] text-[#7A7264] font-mono tabular-nums">
-                    Sold: {formatRupiah(tx.sellPrice)} | Cost: {formatRupiah(tx.costPrice)}
-                  </div>
-                  {tx.customerPhone && (
                     <button
-                      onClick={() => openWhatsApp(tx.customerPhone, tx.customerName)}
-                      className="p-2 text-[#1E5C27] bg-[#EAF3EA] hover:bg-[#D8EBD9] border border-[#C2E0C7] rounded-xl active-press transition-all"
-                      title="Send WhatsApp"
+                      onClick={() => handleOpenEdit(c)}
+                      className="p-2 text-[#6E604A] bg-[#F2EDE2] hover:bg-[#EAE2D2] border border-[#E5DFD3] rounded-xl active-press transition-all"
+                      title="Edit Data"
                     >
-                      <MessageSquare className="w-4 h-4 stroke-[2.2]" />
+                      <Edit3 className="w-3.5 h-3.5 stroke-[2]" />
                     </button>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
 
-      {/* 2. Customers List */}
-      {subTab === 'customers' && (
-        <div className="space-y-2.5">
-          {customers.length === 0 ? (
-            <div className="p-8 text-center rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] text-[#8A816F]">
-              <Users className="w-8 h-8 mx-auto mb-2 text-[#C7BC9F]" />
-              <div className="text-xs font-mono">No customers yet</div>
-            </div>
-          ) : (
-            customers.map((cust) => (
-              <div
-                key={cust.id}
-                className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] flex items-center justify-between shadow-xs"
-              >
-                <div className="space-y-1">
-                  <h3 className="text-xs font-display font-bold text-[#1B1814]">{cust.name}</h3>
-                  <div className="text-[11px] text-[#7A7264] font-mono">{cust.phone || '-'}</div>
-                  <div className="text-[10px] text-[#8A816F] font-mono">
-                    Bought: <span className="font-bold text-[#1B1814]">{cust.totalTransactions || 0}x</span> ({formatGram(cust.totalGramsBought || 0)})
-                    {cust.address ? ` • ${cust.address}` : ''}
+                    <button
+                      onClick={() => handleDeleteCustomer(c.id)}
+                      className={`p-2 rounded-xl active-press transition-all ${
+                        confirmDeleteId === c.id
+                          ? 'bg-rose-600 text-white shadow-md ring-2 ring-rose-400'
+                          : 'text-rose-700 bg-[#FBEBEB] hover:bg-[#F8DADA] border border-[#F2C2C2]'
+                      }`}
+                      title={confirmDeleteId === c.id ? "Klik sekali lagi untuk menghapus" : "Hapus"}
+                    >
+                      <Trash2 className={`w-3.5 h-3.5 stroke-[2] ${confirmDeleteId === c.id ? 'fill-white' : ''}`} />
+                    </button>
                   </div>
                 </div>
 
-                {cust.phone && (
-                  <button
-                    onClick={() => openWhatsApp(cust.phone, cust.name)}
-                    className="p-2 text-[#1E5C27] bg-[#EAF3EA] hover:bg-[#D8EBD9] border border-[#C2E0C7] rounded-xl active-press transition-all"
-                    title="Send WhatsApp"
-                  >
-                    <MessageSquare className="w-4 h-4 stroke-[2.2]" />
-                  </button>
+                {/* Metrics Bento: LTV, Total Gramasi, Transaksi, Terakhir Beli */}
+                <div className="grid grid-cols-3 gap-2 pt-1 border-t border-[#E5DFD3]">
+                  <div className="p-2 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3] text-center">
+                    <div className="text-[9px] font-mono text-[#8A816F] uppercase">Total Belanja (LTV)</div>
+                    <div className="text-xs font-display font-black text-[#1B1814] tabular-nums mt-0.5">
+                      {formatRupiahJuta(c.ltv)}
+                    </div>
+                  </div>
+
+                  <div className="p-2 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3] text-center">
+                    <div className="text-[9px] font-mono text-[#8A816F] uppercase">Gramasi</div>
+                    <div className="text-xs font-display font-black text-[#1B1814] tabular-nums mt-0.5">
+                      {formatGram(c.totalGrams)}
+                    </div>
+                  </div>
+
+                  <div className="p-2 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3] text-center">
+                    <div className="text-[9px] font-mono text-[#8A816F] uppercase">Transaksi</div>
+                    <div className="text-xs font-display font-black text-[#1B1814] tabular-nums mt-0.5">
+                      {c.totalOrders}x order
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer Notes */}
+                {c.notes && (
+                  <div className="p-2.5 rounded-2xl bg-[#F6F3EC] text-[11px] text-[#6E604A] border border-[#E5DFD3]">
+                    <span className="font-bold text-[#1B1814]">Catatan: </span>
+                    {c.notes}
+                  </div>
+                )}
+
+                {/* Expandable Purchase History */}
+                {c.txList.length > 0 && (
+                  <div>
+                    <button
+                      onClick={() => setExpandedCustId(isExpanded ? null : c.id)}
+                      className="w-full py-1.5 flex items-center justify-between text-xs font-mono font-bold text-[#876618] hover:text-[#1B1814] transition-colors"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <ShoppingBag className="w-3.5 h-3.5 stroke-[2]" />
+                        Riwayat Pembelian ({c.txList.length})
+                      </span>
+                      {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                    </button>
+
+                    {isExpanded && (
+                      <div className="space-y-2 pt-2 border-t border-[#E5DFD3]">
+                        {c.txList.map((tx, idx) => (
+                          <div 
+                            key={tx.id || idx}
+                            className="p-3 rounded-2xl bg-white border border-[#E5DFD3] space-y-1.5"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <div className="font-display font-bold text-xs text-[#1B1814]">
+                                  {tx.itemTitle || 'Emas'}
+                                </div>
+                                <div className="text-[10px] font-mono text-[#8A816F] flex items-center gap-2 mt-0.5">
+                                  <span>{formatDateIndo(tx.saleDate)}</span>
+                                  <span>•</span>
+                                  <span>{formatGram(tx.weight)}</span>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-display font-black text-xs text-[#1B1814] tabular-nums">
+                                  {formatRupiahJuta(tx.sellPrice)}
+                                </div>
+                                <div className="text-[10px] font-mono text-[#1E5C27] font-bold">
+                                  +{formatRupiah(tx.netProfit).replace('Rp', 'Untung ')}
+                                </div>
+                              </div>
+                            </div>
+
+                            {(tx.deliveryLocation || tx.location || tx.paymentMethod) && (
+                              <div className="text-[10px] font-mono text-[#7A7264] pt-1 border-t border-[#F2EDE2] flex items-center justify-between">
+                                <span className="truncate">
+                                  {tx.deliveryLocation || tx.location || '-'}
+                                </span>
+                                <span className="capitalize text-[#1B1814] font-semibold">
+                                  {tx.paymentMethod === 'cash' ? 'Tunai' : tx.paymentMethod === 'transfer' ? 'Transfer Bank' : tx.paymentMethod || '-'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
-            ))
-          )}
-        </div>
-      )}
+            );
+          })
+        )}
+      </div>
 
-      {/* Modal: Record Sale */}
+      {/* Modal: Tambah / Edit Pelanggan */}
       <Modal
-        isOpen={showSaleModal}
-        onClose={() => setShowSaleModal(false)}
-        title="Record Gold Sale"
-      >
-        <form onSubmit={handleSaveSale} className="space-y-3.5 text-xs">
-          <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Select Gold Item *</label>
-            <select
-              required
-              value={saleForm.inventoryId}
-              onChange={(e) => {
-                const invId = Number(e.target.value);
-                const inv = inventory.find(i => i.id === invId);
-                setSaleForm({
-                  ...saleForm,
-                  inventoryId: invId,
-                  sellPrice: inv ? inv.totalBuyPrice + 75000 : 0
-                });
-              }}
-              className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
-            >
-              <option value="">-- Select Ready Stock --</option>
-              {readyItems.map(item => (
-                <option key={item.id} value={item.id}>
-                  {item.title} ({formatGram(item.weight)}) — Cost: {formatRupiah(item.totalBuyPrice)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Customer Name *</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Bu Sri / Mbak Nurul"
-                value={saleForm.customerName}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  const exist = customers.find(c => c.name.toLowerCase() === val.toLowerCase());
-                  if (exist) {
-                    setSaleForm({ ...saleForm, customerId: exist.id, customerName: exist.name, customerPhone: exist.phone });
-                  } else {
-                    setSaleForm({ ...saleForm, customerId: '', customerName: val });
-                  }
-                }}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
-              />
-            </div>
-
-            <div>
-              <label className="block font-bold text-[#1B1814] mb-1">WhatsApp Number</label>
-              <input
-                type="tel"
-                placeholder="0812xxxx"
-                value={saleForm.customerPhone}
-                onChange={(e) => setSaleForm({ ...saleForm, customerPhone: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] font-mono focus:outline-none focus:border-[#C59A3F]"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Sale Date *</label>
-              <input
-                type="date"
-                required
-                value={saleForm.saleDate}
-                onChange={(e) => setSaleForm({ ...saleForm, saleDate: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
-              />
-            </div>
-
-            <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Payment Method</label>
-              <select
-                value={saleForm.paymentMethod}
-                onChange={(e) => setSaleForm({ ...saleForm, paymentMethod: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
-              >
-                <option value="Cash COD">Cash COD</option>
-                <option value="Bank Transfer">Bank Transfer</option>
-                <option value="DP + Settlement">DP + Settlement</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Sale Price (Rp) *</label>
-              <input
-                type="number"
-                required
-                value={saleForm.sellPrice}
-                onChange={(e) => setSaleForm({ ...saleForm, sellPrice: parseFloat(e.target.value) || 0 })}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] font-mono font-bold focus:outline-none focus:border-[#C59A3F]"
-              />
-            </div>
-
-            <div>
-              <label className="block font-bold text-[#1B1814] mb-1">COD / Delivery Fee (Rp)</label>
-              <input
-                type="number"
-                value={saleForm.operationalFee}
-                onChange={(e) => setSaleForm({ ...saleForm, operationalFee: parseFloat(e.target.value) || 0 })}
-                className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] font-mono focus:outline-none focus:border-[#C59A3F]"
-              />
-            </div>
-          </div>
-
-          {/* Profit Preview */}
-          <div className="p-3.5 bg-[#F2EDE2] rounded-2xl border border-[#E5DFD3] space-y-1 font-mono">
-            <div className="flex justify-between text-[#8A816F]">
-              <span>Cost:</span>
-              <span className="tabular-nums">{formatRupiah(currentCost)}</span>
-            </div>
-            <div className="flex justify-between font-bold text-sm text-[#1B1814] pt-1 border-t border-[#E5DFD3]">
-              <span>Net Profit:</span>
-              <span className="text-[#1E5C27] tabular-nums">
-                +{formatRupiah(profitMetrics.netProfit)} ({profitMetrics.marginPercent}%)
-              </span>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-3.5 bg-[#1B1814] text-[#FAF8F5] font-display font-bold rounded-2xl text-xs hover:bg-[#2E2820] transition-all mt-2 active-press ring-1 ring-[#C59A3F]/30"
-          >
-            Save Sale Transaction
-          </button>
-        </form>
-      </Modal>
-
-      {/* Modal: Add Customer */}
-      <Modal
-        isOpen={showCustomerModal}
-        onClose={() => setShowCustomerModal(false)}
-        title="Add Customer"
+        isOpen={showAddModal}
+        onClose={() => {
+          setShowAddModal(false);
+          setEditingCustomer(null);
+        }}
+        title={editingCustomer ? "Edit Pelanggan" : "Tambah Pelanggan Baru"}
       >
         <form onSubmit={handleSaveCustomer} className="space-y-3.5 text-xs">
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Name *</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Nama Pelanggan *</label>
             <input
               type="text"
               required
-              placeholder="e.g. Bu Sri Wahyuni"
-              value={custForm.name}
-              onChange={(e) => setCustForm({ ...custForm, name: e.target.value })}
+              placeholder="Contoh: Bu Sri Wahyuni"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
             />
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">WhatsApp *</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Nomor WhatsApp *</label>
             <input
               type="tel"
               required
-              placeholder="0812xxxx"
-              value={custForm.phone}
-              onChange={(e) => setCustForm({ ...custForm, phone: e.target.value })}
+              placeholder="Contoh: 08123456789"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] font-mono focus:outline-none focus:border-[#C59A3F]"
             />
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Address</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Alamat / Lokasi Langganan</label>
             <input
               type="text"
-              placeholder="District / Landmark"
-              value={custForm.address}
-              onChange={(e) => setCustForm({ ...custForm, address: e.target.value })}
+              placeholder="Contoh: Alun-alun Purbalingga / Kutasari"
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold text-[#1B1814] mb-1">Catatan Khusus</label>
+            <textarea
+              rows="2"
+              placeholder="Contoh: Langganan Antam pecahan 5g, bayar via transfer BCA..."
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans resize-none"
             />
           </div>
 
@@ -475,7 +462,7 @@ export default function CrmTab({ quickSellItem, onClearQuickSell }) {
             type="submit"
             className="w-full py-3.5 bg-[#1B1814] text-[#FAF8F5] font-display font-bold rounded-2xl text-xs hover:bg-[#2E2820] transition-all mt-2 active-press ring-1 ring-[#C59A3F]/30"
           >
-            Save Customer
+            {editingCustomer ? "Simpan Perubahan" : "Simpan Pelanggan"}
           </button>
         </form>
       </Modal>

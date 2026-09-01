@@ -9,6 +9,7 @@ import BottomNav from './components/layout/BottomNav';
 import DashboardTab from './components/dashboard/DashboardTab';
 import ScheduleTab from './components/schedule/ScheduleTab';
 import InventoryTab from './components/inventory/InventoryTab';
+import CrmTab from './components/crm/CrmTab';
 import FinancialReportTab from './components/reports/FinancialReportTab';
 
 // Modals
@@ -62,7 +63,12 @@ export default function App() {
           <InventoryTab onQuickSell={handleQuickSell} />
         )}
 
-        {/* 4. Laporan Keuangan (Financial Report & Sales/CRM) */}
+        {/* 4. Pelanggan (CRM) */}
+        {activeTab === 'crm' && (
+          <CrmTab />
+        )}
+
+        {/* 5. Laporan Keuangan (Financial Report & Sales) */}
         {activeTab === 'reports' && (
           <FinancialReportTab 
             quickSellItem={quickSellItem} 
@@ -71,7 +77,7 @@ export default function App() {
         )}
       </main>
 
-      {/* Bottom Navigation: [ Dashboard | Jadwal | Stok | Laporan Keuangan ] */}
+      {/* Bottom Navigation: [ Dashboard | Jadwal | Stok | Pelanggan | Keuangan ] */}
       <BottomNav 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 

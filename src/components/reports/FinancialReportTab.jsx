@@ -6,21 +6,16 @@ import { exportFinancialReportToExcel } from '../../services/exportService';
 import { 
   Download, 
   Receipt, 
-  Scale, 
-  Coins, 
   ArrowRightLeft, 
-  Users, 
   MessageSquare,
-  Plus,
-  UserPlus
+  Plus
 } from 'lucide-react';
 import Modal from '../common/Modal';
 
 export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) {
-  const [reportSubTab, setReportSubTab] = useState('pnl'); // 'pnl' | 'balance' | 'sales' | 'customers'
+  const [reportSubTab, setReportSubTab] = useState('pnl'); // 'pnl' | 'sales'
   const [pnlPeriod, setPnlPeriod] = useState('all'); // 'all' | 'this_month'
   const [showSaleModal, setShowSaleModal] = useState(false);
-  const [showCustomerModal, setShowCustomerModal] = useState(false);
 
   const inventory = useLiveQuery(() => db.inventory.toArray(), []) || [];
   const transactions = useLiveQuery(() => db.transactions.toArray(), []) || [];
@@ -32,10 +27,6 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
   };
 
   const readyInventory = inventory.filter(item => item.status === 'ready');
-  const totalModalReady = readyInventory.reduce((acc, item) => acc + (Number(item.totalBuyPrice) || 0), 0);
-  const totalGramasiReady = readyInventory.reduce((acc, item) => acc + (Number(item.weight) || 0), 0);
-  const avgMarketPrice = (Number(settings.antam1g || 1455000) + Number(settings.ubs1g || 1420000)) / 2;
-  const estimasiValuasiPasar = totalGramasiReady * avgMarketPrice;
 
   // Filtered Transactions for PnL
   const currentMonthPrefix = new Date().toISOString().slice(0, 7);
@@ -56,15 +47,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
   const avgProfitPerGram = totalGramsSold > 0 ? totalNetProfit / totalGramsSold : 0;
   const netMarginPercent = totalOmset > 0 ? ((totalNetProfit / totalOmset) * 100).toFixed(1) : 0;
 
-  // Balance Sheet Metrics
-  const allTimeOmset = transactions.reduce((acc, tx) => acc + (Number(tx.sellPrice) || 0), 0);
-  const allTimeOp = transactions.reduce((acc, tx) => acc + (Number(tx.operationalFee) || 0), 0);
-  const allTimeNetProfit = transactions.reduce((acc, tx) => acc + (Number(tx.netProfit) || 0), 0);
-  const totalKasTerkumpul = allTimeOmset - allTimeOp;
-  const totalAsetUsaha = totalKasTerkumpul + totalModalReady;
-  const totalEkuitas = totalModalReady + allTimeNetProfit;
-
-  // Sale & Customer Form State
+  // Sale Form State
   const [saleForm, setSaleForm] = useState({
     inventoryId: '',
     customerId: '',
@@ -73,14 +56,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
     saleDate: new Date().toISOString().split('T')[0],
     sellPrice: 0,
     operationalFee: 0,
-    paymentMethod: 'Cash COD',
-    notes: ''
-  });
-
-  const [custForm, setCustForm] = useState({
-    name: '',
-    phone: '',
-    address: '',
+    paymentMethod: 'Tunai',
     notes: ''
   });
 
@@ -183,9 +159,9 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
 
   return (
     <div className="space-y-4 pb-2">
-      {/* Segment Tabs: Keuntungan | Penjualan | Pelanggan */}
+      {/* Segment Tabs: Keuntungan | Penjualan */}
       <div className="flex items-center gap-2">
-        <div className="flex-1 grid grid-cols-3 p-1.5 bg-[#EAE2D2] rounded-2xl font-display font-bold text-xs border border-[#DDD3BF]">
+        <div className="flex-1 grid grid-cols-2 p-1.5 bg-[#EAE2D2] rounded-2xl font-display font-bold text-xs border border-[#DDD3BF]">
           <button
             onClick={() => setReportSubTab('pnl')}
             className={`py-2 rounded-xl transition-all ${
@@ -205,16 +181,6 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             }`}
           >
             Penjualan
-          </button>
-          <button
-            onClick={() => setReportSubTab('customers')}
-            className={`py-2 rounded-xl transition-all ${
-              reportSubTab === 'customers'
-                ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
-                : 'text-[#6E604A] hover:text-[#1B1814]'
-            }`}
-          >
-            Pelanggan
           </button>
         </div>
 
@@ -429,61 +395,6 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
         </div>
       )}
 
-      {/* ========================================================================= */}
-      {/* 4. VIEW: DATABASE PELANGGAN (CRM)                                         */}
-      {/* ========================================================================= */}
-      {reportSubTab === 'customers' && (
-        <div className="space-y-3.5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-display font-bold text-[#7A7264]">
-              Total Pelanggan: {customers.length}
-            </span>
-            <button
-              onClick={() => setShowCustomerModal(true)}
-              className="flex items-center gap-1.5 bg-[#1B1814] text-[#FAF8F5] px-3.5 py-2 rounded-2xl text-xs font-display font-bold hover:bg-[#2E2820] active-press transition-all shadow-sm ring-1 ring-[#C59A3F]/30"
-            >
-              <UserPlus className="w-4 h-4 stroke-[2.5] text-[#DFC28F]" />
-              <span>Tambah Pelanggan</span>
-            </button>
-          </div>
-
-          <div className="space-y-2.5">
-            {customers.length === 0 ? (
-              <div className="p-8 text-center rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] text-[#8A816F]">
-                <Users className="w-8 h-8 mx-auto mb-2 text-[#C7BC9F]" />
-                <div className="text-xs font-mono">Belum ada data pelanggan</div>
-              </div>
-            ) : (
-              customers.map((cust) => (
-                <div
-                  key={cust.id}
-                  className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] flex items-center justify-between shadow-xs"
-                >
-                  <div className="space-y-1">
-                    <h3 className="text-xs font-display font-bold text-[#1B1814]">{cust.name}</h3>
-                    <div className="text-[11px] text-[#7A7264] font-mono">{cust.phone || '-'}</div>
-                    <div className="text-[10px] text-[#8A816F] font-mono">
-                      Pernah beli: <span className="font-bold text-[#1B1814]">{cust.totalTransactions || 0}x</span> ({formatGram(cust.totalGramsBought || 0)})
-                      {cust.address ? ` • ${cust.address}` : ''}
-                    </div>
-                  </div>
-
-                  {cust.phone && (
-                    <button
-                      onClick={() => openWhatsApp(cust.phone, cust.name)}
-                      className="p-2 text-[#1E5C27] bg-[#EAF3EA] hover:bg-[#D8EBD9] border border-[#C2E0C7] rounded-xl active-press transition-all"
-                      title="Kirim WhatsApp"
-                    >
-                      <MessageSquare className="w-4 h-4 stroke-[2.2]" />
-                    </button>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Modal: Catat Penjualan */}
       <Modal
         isOpen={showSaleModal}
@@ -617,57 +528,6 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             className="w-full py-3.5 bg-[#1B1814] text-[#FAF8F5] font-display font-bold rounded-2xl text-xs hover:bg-[#2E2820] transition-all mt-2 active-press ring-1 ring-[#C59A3F]/30"
           >
             Simpan Transaksi Penjualan
-          </button>
-        </form>
-      </Modal>
-
-      {/* Modal: Tambah Pelanggan */}
-      <Modal
-        isOpen={showCustomerModal}
-        onClose={() => setShowCustomerModal(false)}
-        title="Tambah Pelanggan Baru"
-      >
-        <form onSubmit={handleSaveCustomer} className="space-y-3.5 text-xs">
-          <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Nama Pelanggan *</label>
-            <input
-              type="text"
-              required
-              placeholder="Contoh: Bu Sri Wahyuni"
-              value={custForm.name}
-              onChange={(e) => setCustForm({ ...custForm, name: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
-            />
-          </div>
-
-          <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Nomor WhatsApp *</label>
-            <input
-              type="tel"
-              required
-              placeholder="0812xxxx"
-              value={custForm.phone}
-              onChange={(e) => setCustForm({ ...custForm, phone: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] font-mono focus:outline-none focus:border-[#C59A3F]"
-            />
-          </div>
-
-          <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Alamat / Domisili</label>
-            <input
-              type="text"
-              placeholder="Kecamatan / Patokan"
-              value={custForm.address}
-              onChange={(e) => setCustForm({ ...custForm, address: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-3.5 bg-[#1B1814] text-[#FAF8F5] font-display font-bold rounded-2xl text-xs hover:bg-[#2E2820] transition-all mt-2 active-press ring-1 ring-[#C59A3F]/30"
-          >
-            Simpan Pelanggan
           </button>
         </form>
       </Modal>

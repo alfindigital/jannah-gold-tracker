@@ -1,8 +1,8 @@
 import React from 'react';
-import { LayoutDashboard, Calendar, Layers, Receipt } from 'lucide-react';
+import { LayoutDashboard, Calendar, Layers, Users, Receipt } from 'lucide-react';
 
 export default function BottomNav({ activeTab, setActiveTab }) {
-  // Urutan: Dashboard -> Jadwal -> Stok -> Laporan Keuangan
+  // Urutan: Dashboard -> Jadwal -> Stok -> Pelanggan (CRM) -> Keuangan
   const tabs = [
     {
       id: 'dashboard',
@@ -20,6 +20,11 @@ export default function BottomNav({ activeTab, setActiveTab }) {
       title: 'Stok'
     },
     {
+      id: 'crm',
+      icon: Users,
+      title: 'Pelanggan (CRM)'
+    },
+    {
       id: 'reports',
       icon: Receipt,
       title: 'Laporan Keuangan'
@@ -27,8 +32,8 @@ export default function BottomNav({ activeTab, setActiveTab }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#F6F3EC]/95 backdrop-blur-lg border-t border-[#E5DFD3] py-3 pb-safe transition-colors duration-150">
-      <div className="max-w-xs mx-auto flex items-center justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-[#F6F3EC]/95 backdrop-blur-lg border-t border-[#E5DFD3] py-2.5 pb-safe transition-colors duration-150">
+      <div className="max-w-sm mx-auto flex items-center justify-around px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
