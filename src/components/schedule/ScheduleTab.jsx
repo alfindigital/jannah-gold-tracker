@@ -70,13 +70,11 @@ export default function ScheduleTab() {
   };
 
   const handleUpdateStatus = async (id, currentStatus) => {
-    let nextStatus = SCHEDULE_STATUS.ONGOING;
-    if (currentStatus === SCHEDULE_STATUS.ONGOING) {
-      nextStatus = SCHEDULE_STATUS.COMPLETED;
-    } else if (currentStatus === SCHEDULE_STATUS.COMPLETED) {
-      nextStatus = SCHEDULE_STATUS.PENDING;
+    if (currentStatus === SCHEDULE_STATUS.PENDING) {
+      await db.schedules.update(id, { status: SCHEDULE_STATUS.ONGOING });
+    } else if (currentStatus === SCHEDULE_STATUS.ONGOING) {
+      await db.schedules.update(id, { status: SCHEDULE_STATUS.COMPLETED });
     }
-    await db.schedules.update(id, { status: nextStatus });
   };
 
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
@@ -225,27 +223,30 @@ export default function ScheduleTab() {
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => handleUpdateStatus(item.id, item.status)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-display font-bold transition-all active-press flex items-center gap-1 ${
-                        item.status === SCHEDULE_STATUS.COMPLETED
-                          ? 'bg-[#1B1814] text-[#FAF8F5] border border-[#C59A3F]/40 shadow-xs'
-                          : item.status === SCHEDULE_STATUS.ONGOING
-                          ? 'bg-[#E8EFF8] text-[#1D4E89] border border-[#BDD3EC]'
-                          : 'bg-[#F2EDE2] text-[#1B1814] border border-[#E5DFD3] hover:bg-[#EAE5D8]'
-                      }`}
-                    >
-                      {item.status === SCHEDULE_STATUS.COMPLETED ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 stroke-[2.5] text-[#DFC28F]" />
-                          <span>Selesai</span>
-                        </>
-                      ) : item.status === SCHEDULE_STATUS.ONGOING ? (
-                        <span>Proses</span>
-                      ) : (
-                        <span>Mulai</span>
-                      )}
-                    </button>
+                    {item.status === SCHEDULE_STATUS.COMPLETED ? (
+                      <div className="px-3 py-1.5 rounded-xl text-xs font-display font-bold bg-[#E8E2D5] text-[#8A816F] border border-[#DDD5C5] cursor-not-allowed flex items-center gap-1 opacity-75 select-none">
+                        <Check className="w-3.5 h-3.5 stroke-[2.5] text-[#8A816F]" />
+                        <span>Selesai</span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleUpdateStatus(item.id, item.status)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-display font-bold transition-all active-press flex items-center gap-1 ${
+                          item.status === SCHEDULE_STATUS.ONGOING
+                            ? 'bg-[#1B1814] text-[#E5C378] border border-[#D4AF37]/60 shadow-xs ring-1 ring-[#D4AF37]/40'
+                            : 'bg-[#F2EDE2] text-[#1B1814] border border-[#E5DFD3] hover:bg-[#EAE5D8]'
+                        }`}
+                      >
+                        {item.status === SCHEDULE_STATUS.ONGOING ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 stroke-[2.5] text-[#E5C378]" />
+                            <span>Selesai</span>
+                          </>
+                        ) : (
+                          <span>Mulai</span>
+                        )}
+                      </button>
+                    )}
 
                     <button
                       onClick={() => handleDeleteSchedule(item.id)}
