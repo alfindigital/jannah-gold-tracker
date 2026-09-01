@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, SCHEDULE_TYPE, SCHEDULE_STATUS } from '../../db/db';
-import { formatRupiah, formatRupiahJuta, formatDateTimeIndo, getCleanPhoneNumber } from '../../services/calculationService';
+import { formatRupiahJuta, formatDateTimeIndo, getCleanPhoneNumber } from '../../services/calculationService';
 import { 
   Plus, 
   MapPin, 
@@ -117,7 +117,7 @@ export default function ScheduleTab() {
           {[
             { id: 'all', label: 'Semua' },
             { id: SCHEDULE_TYPE.COD, label: 'Antar' },
-            { id: SCHEDULE_TYPE.KULAKAN, label: 'Beli' }
+            { id: SCHEDULE_TYPE.RESTOCK, label: 'Beli' }
           ].map(f => (
             <button
               key={f.id}
@@ -188,7 +188,7 @@ export default function ScheduleTab() {
                   {item.targetAmount > 0 && (
                     <div className="text-right shrink-0 bg-[#F2EDE2] px-2.5 py-1.5 rounded-xl border border-[#E5DFD3]">
                       <div className="text-[9px] text-[#8A816F] font-semibold">
-                        {item.type === SCHEDULE_TYPE.KULAKAN ? 'BUDGET' : 'NOMINAL'}
+                        {item.type === SCHEDULE_TYPE.RESTOCK ? 'BUDGET' : 'NOMINAL'}
                       </div>
                       <div className="text-xs font-mono font-extrabold text-[#1B1814] tabular-nums">
                         {formatRupiahJuta(item.targetAmount)}
@@ -290,9 +290,9 @@ export default function ScheduleTab() {
               </button>
               <button
                 type="button"
-                onClick={() => setFormData({ ...formData, type: SCHEDULE_TYPE.KULAKAN })}
+                onClick={() => setFormData({ ...formData, type: SCHEDULE_TYPE.RESTOCK })}
                 className={`py-2 rounded-xl transition-all ${
-                  formData.type === SCHEDULE_TYPE.KULAKAN
+                  formData.type === SCHEDULE_TYPE.RESTOCK
                     ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
                     : 'text-[#7A7264] hover:text-[#1B1814]'
                 }`}

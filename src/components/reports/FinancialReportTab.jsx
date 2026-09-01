@@ -123,21 +123,6 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
     setShowSaleModal(false);
   };
 
-  const handleSaveCustomer = async (e) => {
-    e.preventDefault();
-    await db.customers.add({
-      name: custForm.name,
-      phone: custForm.phone,
-      address: custForm.address,
-      totalTransactions: 0,
-      totalGramsBought: 0,
-      notes: custForm.notes,
-      createdAt: new Date().toISOString()
-    });
-    setCustForm({ name: '', phone: '', address: '', notes: '' });
-    setShowCustomerModal(false);
-  };
-
   const openWhatsApp = (phone, name = '') => {
     const cleanPhone = getCleanPhoneNumber(phone);
     if (!cleanPhone) {

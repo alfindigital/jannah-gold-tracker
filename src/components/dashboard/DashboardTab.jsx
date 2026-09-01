@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db/db';
-import { formatRupiah, formatRupiahJuta, formatGram, formatDateIndo, formatDateTimeIndo } from '../../services/calculationService';
-import { exportFinancialReportToExcel } from '../../services/exportService';
+import { formatRupiah, formatRupiahJuta, formatGram, formatDateTimeIndo } from '../../services/calculationService';
 import { 
   TrendingUp, 
   Layers, 
@@ -11,20 +10,11 @@ import {
   ChevronRight, 
   MapPin, 
   Clock, 
-  Plus, 
-  ArrowRightLeft,
-  Calendar,
-  Receipt,
-  Download,
-  Scale,
-  Coins
+  Calendar
 } from 'lucide-react';
 import Badge from '../common/Badge';
 
 export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
-  const [dashboardView, setDashboardView] = useState('summary'); // 'summary' | 'pnl' | 'balance'
-  const [pnlPeriod, setPnlPeriod] = useState('all'); // 'all' | 'this_month'
-
   const inventory = useLiveQuery(() => db.inventory.toArray(), []) || [];
   const transactions = useLiveQuery(() => db.transactions.toArray(), []) || [];
   const schedules = useLiveQuery(() => db.schedules.toArray(), []) || [];
@@ -36,7 +26,6 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
 
   // 1. Ready Stock Metrics
   const readyInventory = inventory.filter(item => item.status === 'ready');
-  const bookedInventory = inventory.filter(item => item.status === 'booked');
   const totalModalReady = readyInventory.reduce((acc, item) => acc + (Number(item.totalBuyPrice) || 0), 0);
   const totalGramasiReady = readyInventory.reduce((acc, item) => acc + (Number(item.weight) || 0), 0);
 
@@ -44,37 +33,10 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
   const avgMarketPrice = (Number(settings.antam1g || 1455000) + Number(settings.ubs1g || 1420000)) / 2;
   const estimasiValuasiPasar = totalGramasiReady * avgMarketPrice;
 
-  // 2. Filtered Transactions for PnL
-  const currentMonthPrefix = new Date().toISOString().slice(0, 7);
-  const filteredTransactions = transactions.filter(tx => {
-    if (pnlPeriod === 'this_month') {
-      return tx.saleDate && tx.saleDate.startsWith(currentMonthPrefix);
-    }
-    return true;
-  });
-
-  // Waterfall Metrics for Filtered Period
-  const totalOmset = filteredTransactions.reduce((acc, tx) => acc + (Number(tx.sellPrice) || 0), 0);
-  const totalHpp = filteredTransactions.reduce((acc, tx) => acc + (Number(tx.costPrice) || 0), 0);
-  const totalGrossProfit = filteredTransactions.reduce((acc, tx) => acc + (Number(tx.grossProfit) || 0), 0);
-  const totalOperational = filteredTransactions.reduce((acc, tx) => acc + (Number(tx.operationalFee) || 0), 0);
-  const totalNetProfit = filteredTransactions.reduce((acc, tx) => acc + (Number(tx.netProfit) || 0), 0);
-  const totalGramsSold = filteredTransactions.reduce((acc, tx) => acc + (Number(tx.weight) || 0), 0);
-
-  const avgProfitPerGram = totalGramsSold > 0 ? totalNetProfit / totalGramsSold : 0;
-  const netMarginPercent = totalOmset > 0 ? ((totalNetProfit / totalOmset) * 100).toFixed(1) : 0;
-
-  // 3. All-time Metrics (for Summary Bento Cards & Balance Sheet)
-  const allTimeOmset = transactions.reduce((acc, tx) => acc + (Number(tx.sellPrice) || 0), 0);
-  const allTimeOp = transactions.reduce((acc, tx) => acc + (Number(tx.operationalFee) || 0), 0);
+  // 2. All-time Net Profit
   const allTimeNetProfit = transactions.reduce((acc, tx) => acc + (Number(tx.netProfit) || 0), 0);
 
-  // Balance Sheet Metrics
-  const totalKasTerkumpul = allTimeOmset - allTimeOp;
-  const totalAsetUsaha = totalKasTerkumpul + totalModalReady;
-  const totalEkuitas = totalModalReady + allTimeNetProfit;
-
-  // 4. Recent Data for Display
+  // 3. Recent Data for Display
   const latestInventory = [...inventory]
     .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
     .slice(0, 3);
@@ -82,15 +44,6 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
   const activeSchedules = schedules
     .filter(s => s.status !== 'completed')
     .slice(0, 2);
-
-  const handleExportExcel = () => {
-    exportFinancialReportToExcel({
-      transactions,
-      inventory,
-      settings,
-      reportType: dashboardView
-    });
-  };
 
   return (
     <div className="space-y-4 pb-2">
