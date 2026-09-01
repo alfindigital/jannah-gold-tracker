@@ -58,7 +58,7 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
             {/* Card 1: Net Profit (Royal Gold Signature) */}
             <div className="p-4 rounded-3xl bg-gradient-to-br from-[#FFFDF8] via-[#FAF3DE] to-[#F2E3B8] border-2 border-[#D4AF37]/60 space-y-2 shadow-[0_4px_20px_rgba(212,175,55,0.12)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-extrabold text-[#876618] uppercase tracking-wider">Laba Bersih</span>
+                <span className="text-xs font-mono font-extrabold text-[#876618] uppercase tracking-wider">Profit</span>
                 <div className="p-1.5 rounded-xl bg-[#E8C66B]/30 text-[#876618]">
                   <TrendingUp className="w-4 h-4 stroke-[2.8]" />
                 </div>
@@ -74,7 +74,7 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
               className="p-4 rounded-3xl bg-gradient-to-br from-[#FFFDFB] via-[#FAF5EA] to-[#F3EAD7] border-2 border-[#D8BC86]/70 space-y-2 shadow-[0_4px_16px_rgba(197,154,63,0.10)] cursor-pointer hover:border-[#B88E33] transition-all active-press"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-extrabold text-[#946F22] uppercase tracking-wider">Stok Ready</span>
+                <span className="text-xs font-mono font-extrabold text-[#946F22] uppercase tracking-wider">Stok</span>
                 <div className="p-1.5 rounded-xl bg-[#E8D1A0]/35 text-[#946F22]">
                   <Layers className="w-4 h-4 stroke-[2.8]" />
                 </div>
@@ -87,7 +87,7 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
             {/* Card 3: Capital Invested (Sand Gold Reserve) */}
             <div className="p-4 rounded-3xl bg-gradient-to-br from-[#FCFBF8] via-[#F6F2E7] to-[#EBE4D2] border-2 border-[#C9B996]/70 space-y-2 shadow-[0_4px_16px_rgba(138,114,64,0.08)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-extrabold text-[#756447] uppercase tracking-wider">Modal Beli</span>
+                <span className="text-xs font-mono font-extrabold text-[#756447] uppercase tracking-wider">Modal</span>
                 <div className="p-1.5 rounded-xl bg-[#DECFA9]/35 text-[#756447]">
                   <Wallet className="w-4 h-4 stroke-[2.8]" />
                 </div>
@@ -103,7 +103,7 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
               className="p-4 rounded-3xl bg-gradient-to-br from-[#FFFDF5] via-[#FCF2D2] to-[#F8E5A7] border-2 border-[#E8BF48]/80 space-y-2 shadow-[0_4px_20px_rgba(232,191,72,0.18)] cursor-pointer hover:border-[#C79718] transition-all active-press"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-extrabold text-[#8A5F0C] uppercase tracking-wider">Valuasi Pasar</span>
+                <span className="text-xs font-mono font-extrabold text-[#8A5F0C] uppercase tracking-wider">Valuasi</span>
                 <div className="p-1.5 rounded-xl bg-[#FCE389]/45 text-[#8A5F0C]">
                   <ArrowUpRight className="w-4 h-4 stroke-[2.8]" />
                 </div>
