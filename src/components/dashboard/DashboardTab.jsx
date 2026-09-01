@@ -120,7 +120,7 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
               <div className="flex items-center gap-2">
                 <Layers className="w-5 h-5 text-[#A27B2C] stroke-[2.2]" />
                 <h2 className="text-xs font-display font-bold uppercase tracking-wider text-[#1B1814]">
-                  Stok Terbaru
+                  Stok
                 </h2>
               </div>
               <button
@@ -175,7 +175,7 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
               <div className="flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-[#A27B2C] stroke-[2.2]" />
                 <h2 className="text-xs font-display font-bold uppercase tracking-wider text-[#1B1814]">
-                  Jadwal Agenda
+                  Jadwal
                 </h2>
               </div>
               <button
