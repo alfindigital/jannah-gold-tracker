@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import Badge from '../common/Badge';
 
-export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
+export default function DashboardTab({ onNavigateTab, onOpenPriceModal, onOpenGoldPrices }) {
   const inventoryRaw = useLiveQuery(() => db.inventory.toArray(), []);
   const transactionsRaw = useLiveQuery(() => db.transactions.toArray(), []);
   const schedulesRaw = useLiveQuery(() => db.schedules.toArray(), []);
@@ -226,41 +226,50 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
             )}
           </div>
 
-          {/* 4. Gold Benchmark Price */}
+          {/* 4. Gold Benchmark Price – Mini Table */}
           <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-3 shadow-xs">
             <div className="flex items-center justify-between">
               <h2 className="text-xs font-display font-bold uppercase tracking-wider text-[#1B1814]">
                 Harga Emas
               </h2>
               <button
-                onClick={onOpenPriceModal}
+                onClick={onOpenGoldPrices}
                 className="text-[11px] font-mono font-semibold text-[#A27B2C] hover:underline"
               >
-                Ubah
+                Lihat Semua →
               </button>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-2.5 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3]">
-                <div className="text-[10px] font-mono text-[#8A816F]">Antam 1g</div>
-                <div className="text-xs font-mono font-bold text-[#1B1814] mt-0.5 tabular-nums">
-                  {formatRupiah(settings?.antam1g || 1455000).replace('Rp', '')}
-                </div>
-              </div>
+            {/* Header row */}
+            <div className="grid grid-cols-3 items-center text-[10px] font-mono font-bold text-[#8A816F] uppercase tracking-wider px-1">
+              <span>Brand</span>
+              <span className="text-right">Jual/g</span>
+              <span className="text-right">Buyback/g</span>
+            </div>
 
-              <div className="p-2.5 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3]">
-                <div className="text-[10px] font-mono text-[#8A816F]">UBS 1g</div>
-                <div className="text-xs font-mono font-bold text-[#1B1814] mt-0.5 tabular-nums">
-                  {formatRupiah(settings?.ubs1g || 1420000).replace('Rp', '')}
-                </div>
-              </div>
+            {/* Antam row */}
+            <div className="grid grid-cols-3 items-center px-1 py-1.5">
+              <span className="text-xs font-display font-bold text-[#1B1814]">Antam</span>
+              <span className="text-right text-xs font-mono font-bold text-[#1B1814] tabular-nums">
+                {new Intl.NumberFormat('id-ID').format(settings?.antam1g || 1455000)}
+              </span>
+              <span className="text-right text-xs font-mono text-[#7A7264] tabular-nums">
+                {new Intl.NumberFormat('id-ID').format(settings?.antam_buyback || settings?.buyback1g || 1330000)}
+              </span>
+            </div>
 
-              <div className="p-2.5 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3]">
-                <div className="text-[10px] font-mono text-[#8A816F]">Buyback</div>
-                <div className="text-xs font-mono font-bold text-[#1B1814] mt-0.5 tabular-nums">
-                  {formatRupiah(settings?.buyback1g || 1330000).replace('Rp', '')}
-                </div>
-              </div>
+            {/* Divider */}
+            <div className="border-t border-[#EDE8DF] mx-1" />
+
+            {/* UBS row */}
+            <div className="grid grid-cols-3 items-center px-1 py-1.5">
+              <span className="text-xs font-display font-bold text-[#1B1814]">UBS</span>
+              <span className="text-right text-xs font-mono font-bold text-[#1B1814] tabular-nums">
+                {new Intl.NumberFormat('id-ID').format(settings?.ubs1g || 1420000)}
+              </span>
+              <span className="text-right text-xs font-mono text-[#7A7264] tabular-nums">
+                {new Intl.NumberFormat('id-ID').format(settings?.ubs_buyback || settings?.buyback1g || 1305000)}
+              </span>
             </div>
           </div>
         </div>

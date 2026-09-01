@@ -10,6 +10,15 @@ db.version(1).stores({
   settings: 'key'
 });
 
+// v2: expand gold price settings to support per-brand jual + buyback
+db.version(2).stores({
+  inventory: '++id, brand, type, weight, status, purchaseDate, createdAt',
+  transactions: '++id, inventoryId, customerId, saleDate, createdAt',
+  customers: '++id, name, phone, createdAt',
+  schedules: '++id, type, date, status, customerId, createdAt',
+  settings: 'key'
+});
+
 export const STATUS = {
   READY: 'ready',
   BOOKED: 'booked',

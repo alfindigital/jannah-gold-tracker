@@ -11,6 +11,7 @@ import ScheduleTab from './components/schedule/ScheduleTab';
 import InventoryTab from './components/inventory/InventoryTab';
 import CrmTab from './components/crm/CrmTab';
 import FinancialReportTab from './components/reports/FinancialReportTab';
+import GoldPricesTab from './components/goldprices/GoldPricesTab';
 
 // Modals
 import GoldPriceModal from './components/dashboard/GoldPriceModal';
@@ -80,7 +81,7 @@ class ErrorBoundary extends Component {
   }
 }
 
-const VALID_TABS = ['dashboard', 'schedule', 'inventory', 'crm', 'reports'];
+const VALID_TABS = ['dashboard', 'schedule', 'inventory', 'crm', 'reports', 'gold-prices'];
 
 function getTabFromHash() {
   try {
@@ -152,6 +153,7 @@ function MainApp() {
           <DashboardTab 
             onNavigateTab={setActiveTab} 
             onOpenPriceModal={() => setShowPriceModal(true)} 
+            onOpenGoldPrices={() => setActiveTab('gold-prices')}
           />
         )}
 
@@ -176,6 +178,11 @@ function MainApp() {
             quickSellItem={quickSellItem} 
             onClearQuickSell={() => setQuickSellItem(null)} 
           />
+        )}
+
+        {/* 6. Harga Emas Acuan (Full table, all brands) */}
+        {activeTab === 'gold-prices' && (
+          <GoldPricesTab onBack={() => setActiveTab('dashboard')} />
         )}
       </main>
 
