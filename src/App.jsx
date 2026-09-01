@@ -80,10 +80,47 @@ class ErrorBoundary extends Component {
   }
 }
 
+const VALID_TABS = ['dashboard', 'schedule', 'inventory', 'crm', 'reports'];
+
+function getTabFromHash() {
+  try {
+    const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+    return VALID_TABS.includes(hash) ? hash : 'dashboard';
+  } catch (e) {
+    return 'dashboard';
+  }
+}
+
 function MainApp() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTabState] = useState(() => getTabFromHash());
   const [showPriceModal, setShowPriceModal] = useState(false);
   const [quickSellItem, setQuickSellItem] = useState(null);
+
+  // Sync state -> URL Hash
+  const setActiveTab = (tab) => {
+    if (VALID_TABS.includes(tab)) {
+      if (window.location.hash !== `#/${tab}`) {
+        window.location.hash = `#/${tab}`;
+      }
+      setActiveTabState(tab);
+    }
+  };
+
+  // Sync URL Hash (Browser Back / Forward / Refresh / Link) -> State
+  useEffect(() => {
+    const handleHashChange = () => {
+      const tab = getTabFromHash();
+      setActiveTabState(tab);
+    };
+
+    // Set initial hash if missing
+    if (!window.location.hash || !VALID_TABS.includes(window.location.hash.replace(/^#\/?/, ''))) {
+      window.location.hash = `#/${activeTab}`;
+    }
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, [activeTab]);
 
   // Initialize DB with seed data if fresh
   useEffect(() => {
