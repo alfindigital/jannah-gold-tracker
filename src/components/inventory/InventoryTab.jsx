@@ -106,33 +106,8 @@ export default function InventoryTab({ onQuickSell }) {
 
   return (
     <div className="space-y-4 pb-2">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-display font-extrabold text-[#1B1814] tracking-tight">
-          Inventaris Emas
-        </h2>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-1.5 bg-[#1B1814] text-[#FAF8F5] px-3.5 py-2 rounded-2xl text-xs font-display font-bold hover:bg-[#2E2820] active-press transition-all shadow-sm ring-1 ring-[#C59A3F]/30"
-        >
-          <Plus className="w-4 h-4 stroke-[2.5] text-[#DFC28F]" />
-          <span>Tambah</span>
-        </button>
-      </div>
-
-      {/* Search & Filter Pills */}
-      <div className="space-y-2">
-        <div className="relative">
-          <Search className="w-4 h-4 text-[#8A816F] absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Cari gramasi, brand, certicard..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3.5 py-2.5 bg-[#FAF8F5] border border-[#E5DFD3] rounded-2xl text-xs text-[#1B1814] placeholder-[#8A816F] focus:outline-none focus:border-[#C59A3F] transition-colors"
-          />
-        </div>
-
+      {/* 1 Single Top Row: Filters on Left, + Button on Right */}
+      <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
           {[
             { id: 'all', label: 'Semua' },
@@ -153,6 +128,26 @@ export default function InventoryTab({ onQuickSell }) {
             </button>
           ))}
         </div>
+
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="w-8 h-8 rounded-xl bg-[#1B1814] text-[#E5C378] flex items-center justify-center hover:bg-[#2B2317] active-press transition-all shadow-xs ring-1 ring-[#D4AF37]/50 shrink-0"
+          title="Tambah Stok Emas"
+        >
+          <Plus className="w-4 h-4 stroke-[2.8]" />
+        </button>
+      </div>
+
+      {/* Search Input Bar */}
+      <div className="relative">
+        <Search className="w-4 h-4 text-[#8A816F] absolute left-3.5 top-1/2 -translate-y-1/2" />
+        <input
+          type="text"
+          placeholder="Cari gramasi, brand, certicard..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-9 pr-3.5 py-2.5 bg-[#FAF8F5] border border-[#E5DFD3] rounded-2xl text-xs text-[#1B1814] placeholder-[#8A816F] focus:outline-none focus:border-[#C59A3F] transition-colors shadow-xs"
+        />
       </div>
 
       {/* Item List */}
