@@ -15,34 +15,39 @@ import {
 import Badge from '../common/Badge';
 
 export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
-  const inventory = useLiveQuery(() => db.inventory.toArray(), []) || [];
-  const transactions = useLiveQuery(() => db.transactions.toArray(), []) || [];
-  const schedules = useLiveQuery(() => db.schedules.toArray(), []) || [];
-  const settings = useLiveQuery(() => db.settings.get('gold_price_live'), []) || {
+  const inventoryRaw = useLiveQuery(() => db.inventory.toArray(), []);
+  const transactionsRaw = useLiveQuery(() => db.transactions.toArray(), []);
+  const schedulesRaw = useLiveQuery(() => db.schedules.toArray(), []);
+  const settingsRaw = useLiveQuery(() => db.settings.get('gold_price_live'), []);
+
+  const inventory = Array.isArray(inventoryRaw) ? inventoryRaw : [];
+  const transactions = Array.isArray(transactionsRaw) ? transactionsRaw : [];
+  const schedules = Array.isArray(schedulesRaw) ? schedulesRaw : [];
+  const settings = settingsRaw || {
     antam1g: 1455000,
     ubs1g: 1420000,
     buyback1g: 1330000
   };
 
   // 1. Ready Stock Metrics
-  const readyInventory = inventory.filter(item => item.status === 'ready');
-  const totalModalReady = readyInventory.reduce((acc, item) => acc + (Number(item.totalBuyPrice) || 0), 0);
-  const totalGramasiReady = readyInventory.reduce((acc, item) => acc + (Number(item.weight) || 0), 0);
+  const readyInventory = inventory.filter(item => item && item.status === 'ready');
+  const totalModalReady = readyInventory.reduce((acc, item) => acc + (Number(item?.totalBuyPrice) || 0), 0);
+  const totalGramasiReady = readyInventory.reduce((acc, item) => acc + (Number(item?.weight) || 0), 0);
 
   // Market Valuation
-  const avgMarketPrice = (Number(settings.antam1g || 1455000) + Number(settings.ubs1g || 1420000)) / 2;
+  const avgMarketPrice = (Number(settings?.antam1g || 1455000) + Number(settings?.ubs1g || 1420000)) / 2;
   const estimasiValuasiPasar = totalGramasiReady * avgMarketPrice;
 
   // 2. All-time Net Profit
-  const allTimeNetProfit = transactions.reduce((acc, tx) => acc + (Number(tx.netProfit) || 0), 0);
+  const allTimeNetProfit = transactions.reduce((acc, tx) => acc + (Number(tx?.netProfit) || 0), 0);
 
   // 3. Recent Data for Display
   const latestInventory = [...inventory]
-    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+    .sort((a, b) => new Date(b?.createdAt || 0) - new Date(a?.createdAt || 0))
     .slice(0, 3);
 
   const activeSchedules = schedules
-    .filter(s => s.status !== 'completed')
+    .filter(s => s && s.status !== 'completed')
     .slice(0, 2);
 
   return (
@@ -242,21 +247,21 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
               <div className="p-2.5 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3]">
                 <div className="text-[10px] font-mono text-[#8A816F]">Antam 1g</div>
                 <div className="text-xs font-mono font-bold text-[#1B1814] mt-0.5 tabular-nums">
-                  {formatRupiah(settings.antam1g).replace('Rp', '')}
+                  {formatRupiah(settings?.antam1g || 1455000).replace('Rp', '')}
                 </div>
               </div>
 
               <div className="p-2.5 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3]">
                 <div className="text-[10px] font-mono text-[#8A816F]">UBS 1g</div>
                 <div className="text-xs font-mono font-bold text-[#1B1814] mt-0.5 tabular-nums">
-                  {formatRupiah(settings.ubs1g).replace('Rp', '')}
+                  {formatRupiah(settings?.ubs1g || 1420000).replace('Rp', '')}
                 </div>
               </div>
 
               <div className="p-2.5 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3]">
                 <div className="text-[10px] font-mono text-[#8A816F]">Buyback</div>
                 <div className="text-xs font-mono font-bold text-[#1B1814] mt-0.5 tabular-nums">
-                  {formatRupiah(settings.buyback1g).replace('Rp', '')}
+                  {formatRupiah(settings?.buyback1g || 1330000).replace('Rp', '')}
                 </div>
               </div>
             </div>

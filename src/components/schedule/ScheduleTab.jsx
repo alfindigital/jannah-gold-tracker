@@ -18,7 +18,8 @@ export default function ScheduleTab() {
   const [filterType, setFilterType] = useState('all');
   const [showModal, setShowModal] = useState(false);
 
-  const schedules = useLiveQuery(() => db.schedules.toArray(), []) || [];
+  const schedulesRaw = useLiveQuery(() => db.schedules.toArray(), []);
+  const schedules = Array.isArray(schedulesRaw) ? schedulesRaw : [];
 
   const [formData, setFormData] = useState({
     title: '',
@@ -33,6 +34,7 @@ export default function ScheduleTab() {
   });
 
   const filteredSchedules = schedules.filter(item => {
+    if (!item) return false;
     if (filterType !== 'all' && item.type !== filterType) return false;
     return true;
   });

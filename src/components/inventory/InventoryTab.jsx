@@ -32,9 +32,11 @@ export default function InventoryTab({ onQuickSell }) {
     notes: ''
   });
 
-  const inventory = useLiveQuery(() => db.inventory.toArray(), []) || [];
+  const inventoryRaw = useLiveQuery(() => db.inventory.toArray(), []);
+  const inventory = Array.isArray(inventoryRaw) ? inventoryRaw : [];
 
   const filteredItems = inventory.filter(item => {
+    if (!item) return false;
     if (filterStatus !== 'all' && item.status !== filterStatus) return false;
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();

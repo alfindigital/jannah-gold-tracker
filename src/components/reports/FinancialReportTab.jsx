@@ -17,16 +17,21 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
   const [pnlPeriod, setPnlPeriod] = useState('all'); // 'all' | 'this_month'
   const [showSaleModal, setShowSaleModal] = useState(false);
 
-  const inventory = useLiveQuery(() => db.inventory.toArray(), []) || [];
-  const transactions = useLiveQuery(() => db.transactions.toArray(), []) || [];
-  const customers = useLiveQuery(() => db.customers.toArray(), []) || [];
-  const settings = useLiveQuery(() => db.settings.get('gold_price_live'), []) || {
+  const inventoryRaw = useLiveQuery(() => db.inventory.toArray(), []);
+  const transactionsRaw = useLiveQuery(() => db.transactions.toArray(), []);
+  const customersRaw = useLiveQuery(() => db.customers.toArray(), []);
+  const settingsRaw = useLiveQuery(() => db.settings.get('gold_price_live'), []);
+
+  const inventory = Array.isArray(inventoryRaw) ? inventoryRaw : [];
+  const transactions = Array.isArray(transactionsRaw) ? transactionsRaw : [];
+  const customers = Array.isArray(customersRaw) ? customersRaw : [];
+  const settings = settingsRaw || {
     antam1g: 1455000,
     ubs1g: 1420000,
     buyback1g: 1330000
   };
 
-  const readyInventory = inventory.filter(item => item.status === 'ready');
+  const readyInventory = inventory.filter(item => item && item.status === 'ready');
 
   // Filtered Transactions for PnL
   const currentMonthPrefix = new Date().toISOString().slice(0, 7);

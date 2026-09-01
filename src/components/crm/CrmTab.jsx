@@ -1,4 +1,4 @@
-﻿import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db/db';
 import { 
@@ -23,8 +23,11 @@ import {
 } from '../../services/calculationService';
 
 export default function CrmTab() {
-  const customers = useLiveQuery(() => db.customers.toArray()) || [];
-  const transactions = useLiveQuery(() => db.transactions.toArray()) || [];
+  const customersRaw = useLiveQuery(() => db.customers.toArray(), []);
+  const transactionsRaw = useLiveQuery(() => db.transactions.toArray(), []);
+
+  const customers = Array.isArray(customersRaw) ? customersRaw : [];
+  const transactions = Array.isArray(transactionsRaw) ? transactionsRaw : [];
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all' | 'vip' | 'regular' | 'new'
@@ -55,12 +58,12 @@ export default function CrmTab() {
 
   // Merge customer with their calculated transaction metrics
   const customerList = useMemo(() => {
-    return customers.map(c => {
+    return customers.filter(Boolean).map(c => {
       // Find all transactions for this customer (by ID or normalized name)
       const custTxs = transactions.filter(t => 
-        (t.customerId && t.customerId === c.id) || 
-        (t.customerName && t.customerName.trim().toLowerCase() === c.name.trim().toLowerCase())
-      ).sort((a, b) => new Date(b.saleDate) - new Date(a.saleDate));
+        t && ((t.customerId && t.customerId === c.id) || 
+        (t.customerName && t.customerName.trim().toLowerCase() === (c.name || '').trim().toLowerCase()))
+      ).sort((a, b) => new Date(b.saleDate || 0) - new Date(a.saleDate || 0));
 
       const totalLtv = custTxs.reduce((acc, t) => acc + (Number(t.sellPrice) || 0), 0);
       const totalGrams = custTxs.reduce((acc, t) => acc + (Number(t.weight) || 0), 0);
