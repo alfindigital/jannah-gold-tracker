@@ -183,9 +183,9 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
 
   return (
     <div className="space-y-4 pb-2">
-      {/* Segment Tabs + Excel Export Button in 1 clean row */}
+      {/* Segment Tabs: Keuntungan | Penjualan | Pelanggan */}
       <div className="flex items-center gap-2">
-        <div className="flex-1 grid grid-cols-4 p-1.5 bg-[#EAE2D2] rounded-2xl font-display font-bold text-xs border border-[#DDD3BF]">
+        <div className="flex-1 grid grid-cols-3 p-1.5 bg-[#EAE2D2] rounded-2xl font-display font-bold text-xs border border-[#DDD3BF]">
           <button
             onClick={() => setReportSubTab('pnl')}
             className={`py-2 rounded-xl transition-all ${
@@ -194,17 +194,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
                 : 'text-[#6E604A] hover:text-[#1B1814]'
             }`}
           >
-            Laba Rugi
-          </button>
-          <button
-            onClick={() => setReportSubTab('balance')}
-            className={`py-2 rounded-xl transition-all ${
-              reportSubTab === 'balance'
-                ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
-                : 'text-[#6E604A] hover:text-[#1B1814]'
-            }`}
-          >
-            Neraca
+            Keuntungan
           </button>
           <button
             onClick={() => setReportSubTab('sales')}
@@ -366,115 +356,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
       )}
 
       {/* ========================================================================= */}
-      {/* 2. VIEW: NERACA (BALANCE SHEET)                                           */}
-      {/* ========================================================================= */}
-      {reportSubTab === 'balance' && (
-        <div className="space-y-3.5">
-          {/* Total Net Worth Card */}
-          <div className="p-5 rounded-3xl bg-[#1B1814] text-[#FAF8F5] space-y-1.5 shadow-md ring-1 ring-[#C59A3F]/30">
-            <div className="text-[11px] font-mono tracking-wider uppercase text-[#DFC28F]">
-              Total Ekuitas Bisnis (Aset Bersih)
-            </div>
-            <div className="text-3xl font-display font-extrabold tabular-nums tracking-tight text-[#FAF8F5]">
-              {formatRupiahJuta(totalAsetUsaha)}
-            </div>
-            <div className="text-xs font-mono text-[#B8AF9F] pt-1">
-              Kas Hasil Penjualan + Modal Stok Aktif
-            </div>
-          </div>
-
-          {/* Section 1: Aset Lancar */}
-          <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-3 shadow-xs">
-            <div className="flex items-center gap-2 border-b border-[#E5DFD3] pb-2.5">
-              <Coins className="w-4 h-4 text-[#A27B2C] stroke-[2.2]" />
-              <h3 className="text-xs font-display font-bold uppercase tracking-wider text-[#1B1814]">
-                1. Aset Lancar
-              </h3>
-            </div>
-
-            <div className="space-y-2 text-xs font-mono">
-              <div className="p-2.5 rounded-xl bg-[#F2EDE2] flex items-center justify-between">
-                <div>
-                  <div className="font-bold text-[#1B1814]">Kas Terkumpul dari Penjualan</div>
-                  <div className="text-[10px] text-[#8A816F]">Total omset diterima - biaya kurir</div>
-                </div>
-                <div className="font-bold text-[#1B1814] tabular-nums">
-                  {formatRupiahJuta(totalKasTerkumpul)}
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-[#F2EDE2] flex items-center justify-between">
-                <div>
-                  <div className="font-bold text-[#1B1814]">Nilai Persediaan (Sesuai Modal)</div>
-                  <div className="text-[10px] text-[#8A816F]">{readyInventory.length} item ({formatGram(totalGramasiReady)})</div>
-                </div>
-                <div className="font-bold text-[#1B1814] tabular-nums">
-                  {formatRupiahJuta(totalModalReady)}
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-[#F2EDE2] flex items-center justify-between">
-                <div>
-                  <div className="font-bold text-[#1B1814]">Nilai Pasar Emas Saat Ini</div>
-                  <div className="text-[10px] text-[#8A816F]">Jika seluruh stok dijual di harga hari ini</div>
-                </div>
-                <div className="font-bold text-[#1B1814] tabular-nums">
-                  {formatRupiahJuta(estimasiValuasiPasar)}
-                </div>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-[#EBE5D8] border border-[#DDD5C5] flex items-center justify-between font-bold">
-                <span className="text-[#1B1814]">Total Aset Lancar (Kas + Modal Stok):</span>
-                <span className="text-[#1B1814] text-sm tabular-nums">
-                  {formatRupiahJuta(totalAsetUsaha)}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Section 2: Ekuitas & Pertumbuhan */}
-          <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-3 shadow-xs">
-            <div className="flex items-center gap-2 border-b border-[#E5DFD3] pb-2.5">
-              <Scale className="w-4 h-4 text-[#A27B2C] stroke-[2.2]" />
-              <h3 className="text-xs font-display font-bold uppercase tracking-wider text-[#1B1814]">
-                2. Ekuitas & Pertumbuhan Bisnis
-              </h3>
-            </div>
-
-            <div className="space-y-2 text-xs font-mono">
-              <div className="p-2.5 rounded-xl bg-[#F2EDE2] flex items-center justify-between">
-                <div>
-                  <div className="font-bold text-[#1B1814]">Modal Stok Aktif</div>
-                  <div className="text-[10px] text-[#8A816F]">Modal yang tertanam pada emas ready</div>
-                </div>
-                <div className="font-bold text-[#1B1814] tabular-nums">
-                  {formatRupiahJuta(totalModalReady)}
-                </div>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-[#F2EDE2] flex items-center justify-between">
-                <div>
-                  <div className="font-bold text-[#1B1814]">Akumulasi Laba Bersih</div>
-                  <div className="text-[10px] text-[#8A816F]">Total profit yang telah dihasilkan</div>
-                </div>
-                <div className="font-bold text-[#1E5C27] tabular-nums">
-                  +{formatRupiahJuta(allTimeNetProfit)}
-                </div>
-              </div>
-
-              <div className="p-3 rounded-2xl bg-[#EBE5D8] border border-[#DDD5C5] flex items-center justify-between font-bold">
-                <span className="text-[#1B1814]">Total Ekuitas Bersih:</span>
-                <span className="text-[#1B1814] text-sm tabular-nums">
-                  {formatRupiahJuta(totalEkuitas)}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================================= */}
-      {/* 3. VIEW: RIWAYAT PENJUALAN                                                */}
+      {/* 2. VIEW: RIWAYAT PENJUALAN                                                */}
       {/* ========================================================================= */}
       {reportSubTab === 'sales' && (
         <div className="space-y-3.5">
