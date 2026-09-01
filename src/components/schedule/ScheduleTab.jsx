@@ -99,39 +99,35 @@ export default function ScheduleTab() {
 
   return (
     <div className="space-y-4 pb-2">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-display font-extrabold text-[#1B1814] tracking-tight">
-          Jadwal Agenda
-        </h2>
+      {/* 1 Single Top Row: Filters on Left, + Button on Right */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          {[
+            { id: 'all', label: 'Semua' },
+            { id: SCHEDULE_TYPE.COD, label: 'Antar' },
+            { id: SCHEDULE_TYPE.KULAKAN, label: 'Beli' }
+          ].map(f => (
+            <button
+              key={f.id}
+              onClick={() => setFilterType(f.id)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-display font-bold transition-all ${
+                filterType === f.id
+                  ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+                  : 'bg-[#FAF8F5] text-[#7A7264] border border-[#E5DFD3] hover:bg-[#F2EDE2]'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-1.5 bg-[#1B1814] text-[#FAF8F5] px-3.5 py-2 rounded-2xl text-xs font-display font-bold hover:bg-[#2E2820] active-press transition-all shadow-sm ring-1 ring-[#C59A3F]/30"
+          className="w-8 h-8 rounded-xl bg-[#1B1814] text-[#E5C378] flex items-center justify-center hover:bg-[#2B2317] active-press transition-all shadow-xs ring-1 ring-[#D4AF37]/50 shrink-0"
+          title="Tambah Jadwal"
         >
-          <Plus className="w-4 h-4 stroke-[2.5] text-[#DFC28F]" />
-          <span>Jadwal</span>
+          <Plus className="w-4 h-4 stroke-[2.8]" />
         </button>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-        {[
-          { id: 'all', label: 'Semua' },
-          { id: SCHEDULE_TYPE.COD, label: 'Antar' },
-          { id: SCHEDULE_TYPE.KULAKAN, label: 'Beli' }
-        ].map(f => (
-          <button
-            key={f.id}
-            onClick={() => setFilterType(f.id)}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-display font-bold transition-all ${
-              filterType === f.id
-                ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
-                : 'bg-[#FAF8F5] text-[#7A7264] border border-[#E5DFD3] hover:bg-[#F2EDE2]'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
       </div>
 
       {/* Schedule Items */}
