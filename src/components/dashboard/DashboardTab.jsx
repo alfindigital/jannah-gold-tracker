@@ -144,20 +144,15 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
                     onClick={() => onNavigateTab('inventory')}
                     className="flex items-center justify-between p-3 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3] hover:border-[#C59A3F]/50 transition-all cursor-pointer"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-[#EBE5D8] flex items-center justify-center font-mono font-bold text-xs text-[#1B1814] border border-[#DDD5C5]">
-                        {formatGram(item.weight)}
+                    <div className="space-y-0.5">
+                      <div className="text-xs font-display font-bold text-[#1B1814] leading-tight">
+                        {item.title}
                       </div>
-                      <div>
-                        <div className="text-xs font-display font-bold text-[#1B1814] leading-tight">
-                          {item.title}
-                        </div>
-                        <div className="text-[11px] text-[#7A7264] font-mono">
-                          {item.brand} • {formatDateIndo(item.purchaseDate)}
-                        </div>
+                      <div className="text-[11px] text-[#7A7264] font-mono">
+                        {item.brand} • {formatGram(item.weight)} • {formatDateIndo(item.purchaseDate)}
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right shrink-0">
                       <Badge status={item.status} />
                       <div className="text-xs font-mono font-bold text-[#1B1814] mt-1 tabular-nums">
                         {formatRupiahJuta(item.totalBuyPrice)}
