@@ -83,10 +83,24 @@ export default function InventoryTab({ onQuickSell }) {
     });
   };
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+
+  React.useEffect(() => {
+    if (confirmDeleteId !== null) {
+      const timer = setTimeout(() => {
+        setConfirmDeleteId(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [confirmDeleteId]);
+
   const handleDeleteItem = async (id) => {
-    if (window.confirm('Hapus stok emas ini dari inventaris?')) {
+    if (confirmDeleteId === id) {
       await db.inventory.delete(id);
       setSelectedItem(null);
+      setConfirmDeleteId(null);
+    } else {
+      setConfirmDeleteId(id);
     }
   };
 
@@ -409,10 +423,14 @@ export default function InventoryTab({ onQuickSell }) {
               )}
               <button
                 onClick={() => handleDeleteItem(selectedItem.id)}
-                className="p-3 text-rose-700 bg-[#FBEBEB] border border-[#F2C2C2] rounded-2xl active-press"
-                title="Hapus Stok"
+                className={`p-3 rounded-2xl active-press transition-all ${
+                  confirmDeleteId === selectedItem.id
+                    ? 'bg-rose-600 text-white shadow-md ring-2 ring-rose-400'
+                    : 'text-rose-700 bg-[#FBEBEB] border border-[#F2C2C2]'
+                }`}
+                title={confirmDeleteId === selectedItem.id ? "Klik sekali lagi untuk menghapus" : "Hapus Stok"}
               >
-                <Trash2 className="w-4 h-4 stroke-[2]" />
+                <Trash2 className={`w-4 h-4 stroke-[2] ${confirmDeleteId === selectedItem.id ? 'fill-white' : ''}`} />
               </button>
             </div>
           </div>

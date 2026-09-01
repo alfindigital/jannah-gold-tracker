@@ -79,9 +79,23 @@ export default function ScheduleTab() {
     await db.schedules.update(id, { status: nextStatus });
   };
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+
+  React.useEffect(() => {
+    if (confirmDeleteId !== null) {
+      const timer = setTimeout(() => {
+        setConfirmDeleteId(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [confirmDeleteId]);
+
   const handleDeleteSchedule = async (id) => {
-    if (window.confirm('Hapus jadwal ini?')) {
+    if (confirmDeleteId === id) {
       await db.schedules.delete(id);
+      setConfirmDeleteId(null);
+    } else {
+      setConfirmDeleteId(id);
     }
   };
 
@@ -235,10 +249,14 @@ export default function ScheduleTab() {
 
                     <button
                       onClick={() => handleDeleteSchedule(item.id)}
-                      className="p-2 text-rose-700 bg-[#FBEBEB] hover:bg-[#F8DADA] border border-[#F2C2C2] rounded-xl active-press transition-all"
-                      title="Hapus"
+                      className={`p-2 rounded-xl active-press transition-all ${
+                        confirmDeleteId === item.id
+                          ? 'bg-rose-600 text-white shadow-md ring-2 ring-rose-400'
+                          : 'text-rose-700 bg-[#FBEBEB] hover:bg-[#F8DADA] border border-[#F2C2C2]'
+                      }`}
+                      title={confirmDeleteId === item.id ? "Klik sekali lagi untuk menghapus" : "Hapus"}
                     >
-                      <Trash2 className="w-3.5 h-3.5 stroke-[2]" />
+                      <Trash2 className={`w-3.5 h-3.5 stroke-[2] ${confirmDeleteId === item.id ? 'fill-white' : ''}`} />
                     </button>
                   </div>
                 </div>
