@@ -22,7 +22,7 @@ export default function InventoryTab({ onQuickSell }) {
   const [formData, setFormData] = useState({
     title: '',
     brand: 'Antam',
-    type: 'Gold Bar (LM)',
+    type: 'Logam Mulia (LM)',
     weight: 1.0,
     purity: '24K / 99.99%',
     purchaseDate: new Date().toISOString().split('T')[0],
@@ -72,7 +72,7 @@ export default function InventoryTab({ onQuickSell }) {
     setFormData({
       title: '',
       brand: 'Antam',
-      type: 'Gold Bar (LM)',
+      type: 'Logam Mulia (LM)',
       weight: 1.0,
       purity: '24K / 99.99%',
       purchaseDate: new Date().toISOString().split('T')[0],
@@ -84,7 +84,7 @@ export default function InventoryTab({ onQuickSell }) {
   };
 
   const handleDeleteItem = async (id) => {
-    if (window.confirm('Delete this inventory item?')) {
+    if (window.confirm('Hapus stok emas ini dari inventaris?')) {
       await db.inventory.delete(id);
       setSelectedItem(null);
     }
@@ -95,14 +95,14 @@ export default function InventoryTab({ onQuickSell }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-display font-extrabold text-[#1B1814] tracking-tight">
-          Gold Inventory
+          Inventaris Emas
         </h2>
         <button
           onClick={() => setShowAddModal(true)}
           className="flex items-center gap-1.5 bg-[#1B1814] text-[#FAF8F5] px-3.5 py-2 rounded-2xl text-xs font-display font-bold hover:bg-[#2E2820] active-press transition-all shadow-sm ring-1 ring-[#C59A3F]/30"
         >
           <Plus className="w-4 h-4 stroke-[2.5] text-[#DFC28F]" />
-          <span>Add</span>
+          <span>Tambah</span>
         </button>
       </div>
 
@@ -112,7 +112,7 @@ export default function InventoryTab({ onQuickSell }) {
           <Search className="w-4 h-4 text-[#8A816F] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search weight, brand, certicard..."
+            placeholder="Cari gramasi, brand, certicard..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-9 pr-3.5 py-2.5 bg-[#FAF8F5] border border-[#E5DFD3] rounded-2xl text-xs text-[#1B1814] placeholder-[#8A816F] focus:outline-none focus:border-[#C59A3F] transition-colors"
@@ -121,10 +121,10 @@ export default function InventoryTab({ onQuickSell }) {
 
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
           {[
-            { id: 'all', label: 'All' },
+            { id: 'all', label: 'Semua' },
             { id: STATUS.READY, label: 'Ready' },
             { id: STATUS.BOOKED, label: 'Booked' },
-            { id: STATUS.SOLD, label: 'Sold' }
+            { id: STATUS.SOLD, label: 'Terjual' }
           ].map(f => (
             <button
               key={f.id}
@@ -146,7 +146,7 @@ export default function InventoryTab({ onQuickSell }) {
         {filteredItems.length === 0 ? (
           <div className="p-8 text-center rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] text-[#8A816F]">
             <Layers className="w-8 h-8 mx-auto mb-2 text-[#C7BC9F]" />
-            <div className="text-xs font-mono">No inventory items found</div>
+            <div className="text-xs font-mono">Belum ada stok emas ditemukan</div>
           </div>
         ) : (
           filteredItems.map((item) => (
@@ -176,7 +176,7 @@ export default function InventoryTab({ onQuickSell }) {
                 </div>
 
                 <div className="text-right">
-                  <div className="text-[10px] text-[#8A816F] font-mono">COST</div>
+                  <div className="text-[10px] text-[#8A816F] font-mono">MODAL</div>
                   <div className="text-xs font-mono font-bold text-[#1B1814] tabular-nums">
                     {formatRupiah(item.totalBuyPrice)}
                   </div>
@@ -187,7 +187,7 @@ export default function InventoryTab({ onQuickSell }) {
               {item.status === STATUS.READY && (
                 <div className="pt-2 border-t border-[#E5DFD3] flex items-center justify-between">
                   <span className="text-[11px] text-[#8A816F] font-mono line-clamp-1">
-                    {item.supplier || 'Ready'}
+                    {item.supplier || 'Ready di Etalase'}
                   </span>
                   <button
                     onClick={(e) => {
@@ -196,7 +196,7 @@ export default function InventoryTab({ onQuickSell }) {
                     }}
                     className="flex items-center gap-1.5 text-xs font-display font-bold text-[#1B1814] bg-[#F2EDE2] hover:bg-[#EAE5D8] px-3 py-1.5 rounded-xl transition-all active-press"
                   >
-                    <span>Sell</span>
+                    <span>Jual</span>
                     <ArrowRight className="w-3.5 h-3.5 stroke-[2.2] text-[#A27B2C]" />
                   </button>
                 </div>
@@ -206,19 +206,19 @@ export default function InventoryTab({ onQuickSell }) {
         )}
       </div>
 
-      {/* Modal: Add Stock */}
+      {/* Modal: Tambah Stok */}
       <Modal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
-        title="Input Purchase Stock"
+        title="Input Stok Pembelian"
       >
         <form onSubmit={handleSaveStock} className="space-y-3.5 text-xs">
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Item Name</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Nama Barang</label>
             <input
               type="text"
               required
-              placeholder="e.g. Antam 1 Gram Certicard 2026"
+              placeholder="Contoh: Antam 1 Gram Certicard 2026"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
@@ -238,31 +238,31 @@ export default function InventoryTab({ onQuickSell }) {
                 <option value="Galeri 24">Galeri 24</option>
                 <option value="Hartadinata">Hartadinata</option>
                 <option value="Lotus Archi">Lotus Archi</option>
-                <option value="Jewelry">Jewelry</option>
-                <option value="Other">Other</option>
+                <option value="Perhiasan">Perhiasan</option>
+                <option value="Lainnya">Lainnya</option>
               </select>
             </div>
 
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Type</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Jenis</label>
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                 className="w-full px-3 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
               >
-                <option value="Gold Bar (LM)">Gold Bar (LM)</option>
-                <option value="Gold Coin">Gold Coin</option>
-                <option value="Ring">Ring</option>
-                <option value="Bracelet">Bracelet</option>
-                <option value="Necklace">Necklace</option>
-                <option value="Earrings">Earrings</option>
+                <option value="Logam Mulia (LM)">Logam Mulia (LM)</option>
+                <option value="Koin Emas">Koin Emas</option>
+                <option value="Cincin">Cincin</option>
+                <option value="Gelang">Gelang</option>
+                <option value="Kalung">Kalung</option>
+                <option value="Anting">Anting</option>
               </select>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Weight (g)</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Berat (g)</label>
               <input
                 type="number"
                 step="0.01"
@@ -275,7 +275,7 @@ export default function InventoryTab({ onQuickSell }) {
             </div>
 
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Purity</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Kadar</label>
               <input
                 type="text"
                 placeholder="24K / 99.99%"
@@ -288,7 +288,7 @@ export default function InventoryTab({ onQuickSell }) {
 
           <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Purchase Date</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Tanggal Beli</label>
               <input
                 type="date"
                 required
@@ -299,10 +299,10 @@ export default function InventoryTab({ onQuickSell }) {
             </div>
 
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Supplier / Source</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Supplier / Toko</label>
               <input
                 type="text"
-                placeholder="Antam Boutique / Store X"
+                placeholder="Butik Antam / Toko X"
                 value={formData.supplier}
                 onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F]"
@@ -312,7 +312,7 @@ export default function InventoryTab({ onQuickSell }) {
 
           <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Unit Buy Price (Rp)</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Harga Beli per Unit (Rp)</label>
               <input
                 type="number"
                 required
@@ -323,7 +323,7 @@ export default function InventoryTab({ onQuickSell }) {
             </div>
 
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Minting / Extra Fee (Rp)</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Ongkos Cetak / Biaya Tambahan (Rp)</label>
               <input
                 type="number"
                 value={formData.buyCostExtra}
@@ -334,7 +334,7 @@ export default function InventoryTab({ onQuickSell }) {
           </div>
 
           <div className="p-3.5 bg-[#F2EDE2] rounded-2xl border border-[#E5DFD3] flex items-center justify-between">
-            <span className="font-bold text-[#1B1814]">Total Cost:</span>
+            <span className="font-bold text-[#1B1814]">Total Modal:</span>
             <span className="font-mono font-extrabold text-sm text-[#1B1814] tabular-nums">
               {formatRupiah((Number(formData.buyPriceUnit) || 0) + (Number(formData.buyCostExtra) || 0))}
             </span>
@@ -344,12 +344,12 @@ export default function InventoryTab({ onQuickSell }) {
             type="submit"
             className="w-full py-3.5 bg-[#1B1814] text-[#FAF8F5] font-display font-bold rounded-2xl text-xs hover:bg-[#2E2820] transition-all mt-2 active-press ring-1 ring-[#C59A3F]/30"
           >
-            Save to Inventory
+            Simpan ke Stok
           </button>
         </form>
       </Modal>
 
-      {/* Modal: Item Detail */}
+      {/* Modal: Detail Barang */}
       {selectedItem && (
         <Modal
           isOpen={!!selectedItem}
@@ -363,22 +363,22 @@ export default function InventoryTab({ onQuickSell }) {
                 <Badge status={selectedItem.status} />
               </div>
               <div className="text-right">
-                <div className="text-[#8A816F] font-mono text-[10px]">TOTAL COST</div>
+                <div className="text-[#8A816F] font-mono text-[10px]">TOTAL MODAL</div>
                 <div className="font-mono font-bold text-sm text-[#1B1814] tabular-nums">{formatRupiah(selectedItem.totalBuyPrice)}</div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2 font-mono">
               <div className="p-3 bg-[#FAF8F5] border border-[#E5DFD3] rounded-2xl">
-                <div className="text-[10px] text-[#8A816F]">BRAND & TYPE</div>
+                <div className="text-[10px] text-[#8A816F]">BRAND & JENIS</div>
                 <div className="font-bold text-[#1B1814]">{selectedItem.brand} ({selectedItem.type})</div>
               </div>
               <div className="p-3 bg-[#FAF8F5] border border-[#E5DFD3] rounded-2xl">
-                <div className="text-[10px] text-[#8A816F]">WEIGHT & PURITY</div>
+                <div className="text-[10px] text-[#8A816F]">BERAT & KADAR</div>
                 <div className="font-bold text-[#1B1814]">{formatGram(selectedItem.weight)} • {selectedItem.purity || '24K'}</div>
               </div>
               <div className="p-3 bg-[#FAF8F5] border border-[#E5DFD3] rounded-2xl">
-                <div className="text-[10px] text-[#8A816F]">PURCHASE DATE</div>
+                <div className="text-[10px] text-[#8A816F]">TANGGAL BELI</div>
                 <div className="font-bold text-[#1B1814]">{formatDateIndo(selectedItem.purchaseDate)}</div>
               </div>
               <div className="p-3 bg-[#FAF8F5] border border-[#E5DFD3] rounded-2xl">
@@ -389,7 +389,7 @@ export default function InventoryTab({ onQuickSell }) {
 
             {selectedItem.notes && (
               <div className="p-3 bg-[#FAF8F5] rounded-2xl text-[#6B6355] border border-[#E5DFD3]">
-                <span className="font-bold text-[#1B1814]">Notes: </span>
+                <span className="font-bold text-[#1B1814]">Catatan: </span>
                 {selectedItem.notes}
               </div>
             )}
@@ -404,13 +404,13 @@ export default function InventoryTab({ onQuickSell }) {
                   }}
                   className="flex-1 py-3.5 bg-[#1B1814] text-[#FAF8F5] font-display font-bold rounded-2xl text-center active-press transition-all ring-1 ring-[#C59A3F]/30"
                 >
-                  Sell
+                  Jual Emas
                 </button>
               )}
               <button
                 onClick={() => handleDeleteItem(selectedItem.id)}
                 className="p-3 text-rose-700 bg-[#FBEBEB] border border-[#F2C2C2] rounded-2xl active-press"
-                title="Delete"
+                title="Hapus Stok"
               >
                 <Trash2 className="w-4 h-4 stroke-[2]" />
               </button>

@@ -80,7 +80,7 @@ export default function ScheduleTab() {
   };
 
   const handleDeleteSchedule = async (id) => {
-    if (window.confirm('Delete this schedule?')) {
+    if (window.confirm('Hapus jadwal ini?')) {
       await db.schedules.delete(id);
     }
   };
@@ -88,11 +88,11 @@ export default function ScheduleTab() {
   const openWhatsApp = (phone, name = '') => {
     const cleanPhone = getCleanPhoneNumber(phone);
     if (!cleanPhone) {
-      alert('WhatsApp number is empty');
+      alert('Nomor WhatsApp belum diisi');
       return;
     }
     const greeting = encodeURIComponent(
-      `Hello ${name || ''}, greetings from Jannah Gold...`
+      `Halo ${name || ''}, salam dari Jannah Gold...`
     );
     window.open(`https://wa.me/${cleanPhone}?text=${greeting}`, '_blank');
   };
@@ -102,23 +102,23 @@ export default function ScheduleTab() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-display font-extrabold text-[#1B1814] tracking-tight">
-          Schedule
+          Jadwal Agenda
         </h2>
         <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-1.5 bg-[#1B1814] text-[#FAF8F5] px-3.5 py-2 rounded-2xl text-xs font-display font-bold hover:bg-[#2E2820] active-press transition-all shadow-sm ring-1 ring-[#C59A3F]/30"
         >
           <Plus className="w-4 h-4 stroke-[2.5] text-[#DFC28F]" />
-          <span>Schedule</span>
+          <span>Jadwal</span>
         </button>
       </div>
 
       {/* Filter Tabs */}
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         {[
-          { id: 'all', label: 'All' },
-          { id: SCHEDULE_TYPE.COD, label: 'Delivery' },
-          { id: SCHEDULE_TYPE.KULAKAN, label: 'Restock' }
+          { id: 'all', label: 'Semua' },
+          { id: SCHEDULE_TYPE.COD, label: 'Antar (COD)' },
+          { id: SCHEDULE_TYPE.KULAKAN, label: 'Beli (Kulakan)' }
         ].map(f => (
           <button
             key={f.id}
@@ -139,7 +139,7 @@ export default function ScheduleTab() {
         {filteredSchedules.length === 0 ? (
           <div className="p-8 text-center rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] text-[#8A816F]">
             <Calendar className="w-8 h-8 mx-auto mb-2 text-[#C7BC9F]" />
-            <div className="text-xs font-mono">No active schedules</div>
+            <div className="text-xs font-mono">Belum ada jadwal aktif</div>
           </div>
         ) : (
           filteredSchedules.map((item) => {
@@ -178,7 +178,7 @@ export default function ScheduleTab() {
                   {item.targetAmount > 0 && (
                     <div className="text-right shrink-0 bg-[#F2EDE2] px-2.5 py-1.5 rounded-xl border border-[#E5DFD3]">
                       <div className="text-[9px] text-[#8A816F] font-semibold">
-                        {item.type === SCHEDULE_TYPE.KULAKAN ? 'BUDGET' : 'AMOUNT'}
+                        {item.type === SCHEDULE_TYPE.KULAKAN ? 'BUDGET' : 'TOTAL COD'}
                       </div>
                       <div className="text-xs font-mono font-extrabold text-[#1B1814] tabular-nums">
                         {formatRupiah(item.targetAmount)}
@@ -200,7 +200,7 @@ export default function ScheduleTab() {
                       <button
                         onClick={() => openWhatsApp(item.contactPhone, item.contactName)}
                         className="p-2 text-[#1E5C27] bg-[#EAF3EA] hover:bg-[#D8EBD9] border border-[#C2E0C7] rounded-xl active-press transition-all"
-                        title="Send WhatsApp"
+                        title="Kirim WhatsApp"
                       >
                         <MessageSquare className="w-4 h-4 stroke-[2.2]" />
                       </button>
@@ -226,19 +226,19 @@ export default function ScheduleTab() {
                       {item.status === SCHEDULE_STATUS.COMPLETED ? (
                         <>
                           <Check className="w-3.5 h-3.5 stroke-[2.5] text-[#DFC28F]" />
-                          <span>Done</span>
+                          <span>Selesai</span>
                         </>
                       ) : item.status === SCHEDULE_STATUS.ONGOING ? (
-                        <span>Process</span>
+                        <span>Proses</span>
                       ) : (
-                        <span>Start</span>
+                        <span>Mulai</span>
                       )}
                     </button>
 
                     <button
                       onClick={() => handleDeleteSchedule(item.id)}
                       className="p-2 text-rose-700 bg-[#FBEBEB] hover:bg-[#F8DADA] border border-[#F2C2C2] rounded-xl active-press transition-all"
-                      title="Delete"
+                      title="Hapus"
                     >
                       <Trash2 className="w-3.5 h-3.5 stroke-[2]" />
                     </button>
@@ -250,15 +250,15 @@ export default function ScheduleTab() {
         )}
       </div>
 
-      {/* Modal: Add Schedule */}
+      {/* Modal: Tambah Jadwal */}
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title="Add New Schedule"
+        title="Tambah Jadwal Baru"
       >
         <form onSubmit={handleSaveSchedule} className="space-y-3.5 text-xs">
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1.5">Agenda Type</label>
+            <label className="block font-bold text-[#1B1814] mb-1.5">Jenis Agenda</label>
             <div className="grid grid-cols-2 p-1 bg-[#EBE5D8] rounded-2xl font-display font-bold text-xs">
               <button
                 type="button"
@@ -269,7 +269,7 @@ export default function ScheduleTab() {
                     : 'text-[#7A7264] hover:text-[#1B1814]'
                 }`}
               >
-                Delivery
+                Antar (COD)
               </button>
               <button
                 type="button"
@@ -280,17 +280,17 @@ export default function ScheduleTab() {
                     : 'text-[#7A7264] hover:text-[#1B1814]'
                 }`}
               >
-                Restock
+                Beli (Kulakan)
               </button>
             </div>
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Agenda Title *</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Judul Agenda *</label>
             <input
               type="text"
               required
-              placeholder={formData.type === SCHEDULE_TYPE.COD ? "e.g. COD Antam 2g Bu Siti" : "e.g. Restock Antam Boutique"}
+              placeholder={formData.type === SCHEDULE_TYPE.COD ? "Contoh: COD Antam 2g Bu Siti" : "Contoh: Kulakan Butik Antam"}
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
@@ -299,7 +299,7 @@ export default function ScheduleTab() {
 
           <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Date *</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Tanggal *</label>
               <input
                 type="date"
                 required
@@ -310,7 +310,7 @@ export default function ScheduleTab() {
             </div>
 
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Time *</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Jam *</label>
               <input
                 type="time"
                 required
@@ -322,11 +322,11 @@ export default function ScheduleTab() {
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Meeting Location *</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Lokasi Janjian *</label>
             <input
               type="text"
               required
-              placeholder="e.g. Indomaret Point / Buyer's House"
+              placeholder="Contoh: Indomaret Point / Rumah Pembeli"
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
@@ -335,10 +335,10 @@ export default function ScheduleTab() {
 
           <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Contact Name</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Nama Kontak</label>
               <input
                 type="text"
-                placeholder="e.g. Bu Sri"
+                placeholder="Contoh: Bu Sri"
                 value={formData.contactName}
                 onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
@@ -346,7 +346,7 @@ export default function ScheduleTab() {
             </div>
 
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Contact WhatsApp</label>
+              <label className="block font-bold text-[#1B1814] mb-1">WhatsApp Kontak</label>
               <input
                 type="tel"
                 placeholder="0812xxxx"
@@ -358,7 +358,7 @@ export default function ScheduleTab() {
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Estimated Amount (Rp)</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Estimasi Nominal (Rp)</label>
             <input
               type="number"
               value={formData.targetAmount}
@@ -368,13 +368,13 @@ export default function ScheduleTab() {
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Additional Notes</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Catatan Tambahan</label>
             <textarea
               rows="2"
-              placeholder="e.g. Bring change..."
+              placeholder="Contoh: Bawa uang kembalian..."
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-3.5 py-2 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
+              className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
             />
           </div>
 
@@ -382,7 +382,7 @@ export default function ScheduleTab() {
             type="submit"
             className="w-full py-3.5 bg-[#1B1814] text-[#FAF8F5] font-display font-bold rounded-2xl text-xs hover:bg-[#2E2820] transition-all mt-2 active-press ring-1 ring-[#C59A3F]/30"
           >
-            Save Schedule
+            Simpan Jadwal
           </button>
         </form>
       </Modal>

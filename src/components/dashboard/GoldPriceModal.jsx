@@ -43,10 +43,10 @@ export default function GoldPriceModal({ isOpen, onClose }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Gold Price Benchmark">
+    <Modal isOpen={isOpen} onClose={onClose} title="Benchmark Harga Emas">
       <form onSubmit={handleSave} className="space-y-3.5 text-xs">
         <p className="text-[#8A816F] text-[11px] leading-relaxed">
-          These per-gram benchmark prices serve as the basis for calculating your active stock valuation.
+          Harga acuan per gram ini digunakan sebagai dasar kalkulasi valuasi stok aktif Anda.
         </p>
 
         <div className="space-y-3">
@@ -73,7 +73,7 @@ export default function GoldPriceModal({ isOpen, onClose }) {
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Galeri 24 / Other 1 Gram (Rp)</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Galeri 24 / Lainnya 1 Gram (Rp)</label>
             <input
               type="number"
               value={prices.galeri24_1g}
@@ -83,7 +83,7 @@ export default function GoldPriceModal({ isOpen, onClose }) {
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Market Buyback Price (Rp)</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Harga Buyback Pasar (Rp)</label>
             <input
               type="number"
               value={prices.buyback1g}
@@ -93,7 +93,7 @@ export default function GoldPriceModal({ isOpen, onClose }) {
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Last Updated Date</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Tanggal Terakhir Diperbarui</label>
             <input
               type="date"
               value={prices.lastUpdated}
@@ -107,7 +107,7 @@ export default function GoldPriceModal({ isOpen, onClose }) {
           type="submit"
           className="w-full py-3.5 bg-[#1B1814] text-[#FAF8F5] font-display font-bold rounded-2xl text-xs hover:bg-[#2E2820] transition-all mt-2 active-press ring-1 ring-[#C59A3F]/30"
         >
-          Save Benchmark
+          Simpan Acuan
         </button>
       </form>
     </Modal>

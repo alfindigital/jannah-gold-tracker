@@ -2,7 +2,7 @@ import React from 'react';
 import { LayoutDashboard, Calendar, Layers, Receipt } from 'lucide-react';
 
 export default function BottomNav({ activeTab, setActiveTab }) {
-  // Ordered: Dashboard -> Jadwal (Schedule) -> Stok (Inventory) -> Laporan Keuangan (Reports)
+  // Urutan: Dashboard -> Jadwal -> Stok -> Laporan Keuangan
   const tabs = [
     {
       id: 'dashboard',
@@ -12,17 +12,17 @@ export default function BottomNav({ activeTab, setActiveTab }) {
     {
       id: 'schedule',
       icon: Calendar,
-      title: 'Schedule'
+      title: 'Jadwal'
     },
     {
       id: 'inventory',
       icon: Layers,
-      title: 'Inventory'
+      title: 'Stok'
     },
     {
       id: 'reports',
       icon: Receipt,
-      title: 'Financial Report'
+      title: 'Laporan Keuangan'
     }
   ];
 

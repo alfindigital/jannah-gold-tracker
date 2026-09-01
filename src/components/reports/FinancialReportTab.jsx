@@ -92,7 +92,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
   const handleSaveSale = async (e) => {
     e.preventDefault();
     if (!selectedInventoryItem) {
-      alert('Please select a gold item to sell');
+      alert('Silakan pilih stok emas yang akan dijual');
       return;
     }
 
@@ -117,7 +117,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
         address: '',
         totalTransactions: 1,
         totalGramsBought: currentWeight,
-        notes: 'Created automatically from sale',
+        notes: 'Dibuat otomatis dari transaksi penjualan',
         createdAt: new Date().toISOString()
       });
     }
@@ -127,7 +127,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
       itemTitle: selectedInventoryItem.title,
       weight: currentWeight,
       customerId: customerId,
-      customerName: customerName || 'Customer',
+      customerName: customerName || 'Pembeli',
       customerPhone: customerPhone || '',
       saleDate: saleForm.saleDate,
       costPrice: currentCost,
@@ -165,10 +165,10 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
   const openWhatsApp = (phone, name = '') => {
     const cleanPhone = getCleanPhoneNumber(phone);
     if (!cleanPhone) {
-      alert('WhatsApp number is empty');
+      alert('Nomor WhatsApp belum diisi');
       return;
     }
-    const greeting = encodeURIComponent(`Hello ${name || ''}, greetings from Jannah Gold...`);
+    const greeting = encodeURIComponent(`Halo ${name || ''}, salam dari Jannah Gold...`);
     window.open(`https://wa.me/${cleanPhone}?text=${greeting}`, '_blank');
   };
 
@@ -186,19 +186,19 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-display font-extrabold text-[#1B1814] tracking-tight">
-          Financial Report
+          Laporan Keuangan
         </h2>
         <button
           onClick={handleExportExcel}
           className="flex items-center gap-1.5 px-3 py-2 bg-[#1B1814] text-[#DFC28F] rounded-2xl text-xs font-display font-bold hover:bg-[#2E2820] active-press shadow-xs ring-1 ring-[#C59A3F]/30"
-          title="Download Excel Report"
+          title="Unduh Laporan Excel"
         >
           <Download className="w-3.5 h-3.5 stroke-[2.5]" />
           <span>Excel</span>
         </button>
       </div>
 
-      {/* Segment Tabs: Profit & Loss | Balance Sheet | Sales History | Customers */}
+      {/* Segment Tabs: Laba Rugi | Neraca | Penjualan | Pelanggan */}
       <div className="grid grid-cols-4 p-1.5 bg-[#EAE2D2] rounded-2xl font-display font-bold text-xs border border-[#DDD3BF]">
         <button
           onClick={() => setReportSubTab('pnl')}
@@ -208,7 +208,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               : 'text-[#6E604A] hover:text-[#1B1814]'
           }`}
         >
-          P&L
+          Laba Rugi
         </button>
         <button
           onClick={() => setReportSubTab('balance')}
@@ -218,7 +218,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               : 'text-[#6E604A] hover:text-[#1B1814]'
           }`}
         >
-          Balance
+          Neraca
         </button>
         <button
           onClick={() => setReportSubTab('sales')}
@@ -228,7 +228,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               : 'text-[#6E604A] hover:text-[#1B1814]'
           }`}
         >
-          Sales
+          Penjualan
         </button>
         <button
           onClick={() => setReportSubTab('customers')}
@@ -238,12 +238,12 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               : 'text-[#6E604A] hover:text-[#1B1814]'
           }`}
         >
-          CRM
+          Pelanggan
         </button>
       </div>
 
       {/* ========================================================================= */}
-      {/* 1. VIEW: PROFIT & LOSS                                                    */}
+      {/* 1. VIEW: LABA RUGI (PROFIT & LOSS)                                        */}
       {/* ========================================================================= */}
       {reportSubTab === 'pnl' && (
         <div className="space-y-3.5">
@@ -253,28 +253,28 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               onClick={() => setPnlPeriod('all')}
               className={`px-3 py-1.5 rounded-xl transition-all ${
                 pnlPeriod === 'all'
-                  ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
+                  ? 'bg-[#1B1814] text-[#E5C378] shadow-xs'
                   : 'text-[#7A7264] hover:text-[#1B1814]'
               }`}
             >
-              All Periods
+              Semua Periode
             </button>
             <button
               onClick={() => setPnlPeriod('this_month')}
               className={`px-3 py-1.5 rounded-xl transition-all ${
                 pnlPeriod === 'this_month'
-                  ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
+                  ? 'bg-[#1B1814] text-[#E5C378] shadow-xs'
                   : 'text-[#7A7264] hover:text-[#1B1814]'
               }`}
             >
-              This Month
+              Bulan Ini
             </button>
           </div>
 
           {/* Highlight Net Profit Card */}
           <div className="p-5 rounded-3xl bg-[#1B1814] text-[#FAF8F5] space-y-1.5 shadow-md ring-1 ring-[#C59A3F]/30">
             <div className="text-[11px] font-mono tracking-wider uppercase text-[#DFC28F]">
-              Net Profit
+              Laba Bersih ({pnlPeriod === 'this_month' ? 'Bulan Ini' : 'Semua Transaksi'})
             </div>
             <div className="text-3xl font-display font-extrabold tabular-nums tracking-tight text-[#FAF8F5]">
               +{formatRupiahJuta(totalNetProfit)}
@@ -282,7 +282,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             <div className="text-xs font-mono text-[#B8AF9F] pt-1 flex items-center gap-3">
               <span>Margin: {netMarginPercent}%</span>
               <span>•</span>
-              <span>{filteredTransactions.length} Transactions</span>
+              <span>{filteredTransactions.length} Transaksi</span>
             </div>
           </div>
 
@@ -291,7 +291,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             <div className="flex items-center gap-2 border-b border-[#E5DFD3] pb-2.5">
               <Receipt className="w-4 h-4 text-[#A27B2C] stroke-[2.2]" />
               <h3 className="text-xs font-display font-bold uppercase tracking-wider text-[#1B1814]">
-                Revenue Breakdown
+                Rincian Pendapatan
               </h3>
             </div>
 
@@ -299,8 +299,8 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               {/* Revenue */}
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F2EDE2]">
                 <div>
-                  <div className="font-bold text-[#1B1814]">Total Sales (Revenue)</div>
-                  <div className="text-[10px] text-[#8A816F]">Gross revenue from buyers</div>
+                  <div className="font-bold text-[#1B1814]">Total Penjualan (Omset)</div>
+                  <div className="text-[10px] text-[#8A816F]">Penerimaan bruto dari pembeli</div>
                 </div>
                 <div className="font-bold text-[#1B1814] tabular-nums">
                   {formatRupiahJuta(totalOmset)}
@@ -310,8 +310,8 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               {/* COGS */}
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F2EDE2]">
                 <div>
-                  <div className="font-bold text-[#1B1814]">Cost of Goods Sold (COGS)</div>
-                  <div className="text-[10px] text-[#8A816F]">Purchase cost of sold items</div>
+                  <div className="font-bold text-[#1B1814]">Harga Pokok Penjualan (HPP)</div>
+                  <div className="text-[10px] text-[#8A816F]">Modal beli barang yang terjual</div>
                 </div>
                 <div className="font-bold text-rose-700 tabular-nums">
                   - {formatRupiahJuta(totalHpp)}
@@ -321,7 +321,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               {/* Gross Profit */}
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#EBE5D8] border border-[#DDD5C5] font-bold">
                 <div className="text-[#1B1814]">
-                  Gross Profit
+                  Laba Kotor
                 </div>
                 <div className="text-[#1B1814] tabular-nums">
                   {formatRupiahJuta(totalGrossProfit)}
@@ -331,8 +331,8 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               {/* Operational & Delivery Fee */}
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F2EDE2]">
                 <div>
-                  <div className="font-bold text-[#1B1814]">Operational & Delivery Fees</div>
-                  <div className="text-[10px] text-[#8A816F]">Gas, delivery & admin fees</div>
+                  <div className="font-bold text-[#1B1814]">Biaya Operasional & Kurir</div>
+                  <div className="text-[10px] text-[#8A816F]">Ongkir, bensin COD & admin</div>
                 </div>
                 <div className="font-bold text-rose-700 tabular-nums">
                   - {formatRupiah(totalOperational)}
@@ -342,7 +342,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               {/* Final Net Profit */}
               <div className="flex items-center justify-between p-3 rounded-2xl bg-[#EAF3EA] border border-[#C2E0C7] font-bold text-sm">
                 <div className="text-[#1E5C27]">
-                  Final Net Profit
+                  Laba Bersih Akhir
                 </div>
                 <div className="text-[#1E5C27] tabular-nums font-extrabold">
                   +{formatRupiahJuta(totalNetProfit)}
@@ -354,56 +354,56 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
           {/* Efficiency Metrics */}
           <div className="grid grid-cols-2 gap-3">
             <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-1 shadow-xs">
-              <div className="text-[10px] font-mono text-[#8A816F] uppercase">Total Sold</div>
+              <div className="text-[10px] font-mono text-[#8A816F] uppercase">Total Terjual</div>
               <div className="text-lg font-display font-extrabold text-[#1B1814] tabular-nums">
                 {formatGram(totalGramsSold)}
               </div>
-              <div className="text-[10px] text-[#8A816F] font-mono">Physical gold sold</div>
+              <div className="text-[10px] text-[#8A816F] font-mono">Emas fisik keluar</div>
             </div>
 
             <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-1 shadow-xs">
-              <div className="text-[10px] font-mono text-[#8A816F] uppercase">Avg Profit / Gram</div>
+              <div className="text-[10px] font-mono text-[#8A816F] uppercase">Rata-rata Laba / Gram</div>
               <div className="text-lg font-display font-extrabold text-[#1B1814] tabular-nums">
                 {formatRupiah(avgProfitPerGram).replace('Rp', 'Rp ')}
               </div>
-              <div className="text-[10px] text-[#8A816F] font-mono">Profit per 1g</div>
+              <div className="text-[10px] text-[#8A816F] font-mono">Margin per 1 gram</div>
             </div>
           </div>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* 2. VIEW: BALANCE SHEET                                                    */}
+      {/* 2. VIEW: NERACA (BALANCE SHEET)                                           */}
       {/* ========================================================================= */}
       {reportSubTab === 'balance' && (
         <div className="space-y-3.5">
           {/* Total Net Worth Card */}
           <div className="p-5 rounded-3xl bg-[#1B1814] text-[#FAF8F5] space-y-1.5 shadow-md ring-1 ring-[#C59A3F]/30">
             <div className="text-[11px] font-mono tracking-wider uppercase text-[#DFC28F]">
-              Total Business Equity (Net Assets)
+              Total Ekuitas Bisnis (Aset Bersih)
             </div>
             <div className="text-3xl font-display font-extrabold tabular-nums tracking-tight text-[#FAF8F5]">
               {formatRupiahJuta(totalAsetUsaha)}
             </div>
             <div className="text-xs font-mono text-[#B8AF9F] pt-1">
-              Sales Cash Revenue + Active Stock Cost
+              Kas Hasil Penjualan + Modal Stok Aktif
             </div>
           </div>
 
-          {/* Section 1: Current Assets */}
+          {/* Section 1: Aset Lancar */}
           <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-3 shadow-xs">
             <div className="flex items-center gap-2 border-b border-[#E5DFD3] pb-2.5">
               <Coins className="w-4 h-4 text-[#A27B2C] stroke-[2.2]" />
               <h3 className="text-xs font-display font-bold uppercase tracking-wider text-[#1B1814]">
-                1. Current Assets
+                1. Aset Lancar
               </h3>
             </div>
 
             <div className="space-y-2 text-xs font-mono">
               <div className="p-2.5 rounded-xl bg-[#F2EDE2] flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-[#1B1814]">Net Cash Collected</div>
-                  <div className="text-[10px] text-[#8A816F]">Total sales revenue - COD fees</div>
+                  <div className="font-bold text-[#1B1814]">Kas Terkumpul dari Penjualan</div>
+                  <div className="text-[10px] text-[#8A816F]">Total omset diterima - biaya kurir</div>
                 </div>
                 <div className="font-bold text-[#1B1814] tabular-nums">
                   {formatRupiahJuta(totalKasTerkumpul)}
@@ -412,8 +412,8 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
 
               <div className="p-2.5 rounded-xl bg-[#F2EDE2] flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-[#1B1814]">Inventory Value (Cost)</div>
-                  <div className="text-[10px] text-[#8A816F]">{readyInventory.length} items ({formatGram(totalGramasiReady)})</div>
+                  <div className="font-bold text-[#1B1814]">Nilai Persediaan (Sesuai Modal)</div>
+                  <div className="text-[10px] text-[#8A816F]">{readyInventory.length} item ({formatGram(totalGramasiReady)})</div>
                 </div>
                 <div className="font-bold text-[#1B1814] tabular-nums">
                   {formatRupiahJuta(totalModalReady)}
@@ -422,8 +422,8 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
 
               <div className="p-2.5 rounded-xl bg-[#F2EDE2] flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-[#1B1814]">Current Gold Market Value</div>
-                  <div className="text-[10px] text-[#8A816F]">If all stock is sold at today's benchmark</div>
+                  <div className="font-bold text-[#1B1814]">Nilai Pasar Emas Saat Ini</div>
+                  <div className="text-[10px] text-[#8A816F]">Jika seluruh stok dijual di harga hari ini</div>
                 </div>
                 <div className="font-bold text-[#1B1814] tabular-nums">
                   {formatRupiahJuta(estimasiValuasiPasar)}
@@ -431,7 +431,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               </div>
 
               <div className="p-3 rounded-2xl bg-[#EBE5D8] border border-[#DDD5C5] flex items-center justify-between font-bold">
-                <span className="text-[#1B1814]">Total Assets (Cash + Stock Cost):</span>
+                <span className="text-[#1B1814]">Total Aset Lancar (Kas + Modal Stok):</span>
                 <span className="text-[#1B1814] text-sm tabular-nums">
                   {formatRupiahJuta(totalAsetUsaha)}
                 </span>
@@ -439,20 +439,20 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             </div>
           </div>
 
-          {/* Section 2: Equity & Growth */}
+          {/* Section 2: Ekuitas & Pertumbuhan */}
           <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-3 shadow-xs">
             <div className="flex items-center gap-2 border-b border-[#E5DFD3] pb-2.5">
               <Scale className="w-4 h-4 text-[#A27B2C] stroke-[2.2]" />
               <h3 className="text-xs font-display font-bold uppercase tracking-wider text-[#1B1814]">
-                2. Equity & Business Growth
+                2. Ekuitas & Pertumbuhan Bisnis
               </h3>
             </div>
 
             <div className="space-y-2 text-xs font-mono">
               <div className="p-2.5 rounded-xl bg-[#F2EDE2] flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-[#1B1814]">Active Stock Capital</div>
-                  <div className="text-[10px] text-[#8A816F]">Unrecovered capital in active stock</div>
+                  <div className="font-bold text-[#1B1814]">Modal Stok Aktif</div>
+                  <div className="text-[10px] text-[#8A816F]">Modal yang tertanam pada emas ready</div>
                 </div>
                 <div className="font-bold text-[#1B1814] tabular-nums">
                   {formatRupiahJuta(totalModalReady)}
@@ -461,8 +461,8 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
 
               <div className="p-2.5 rounded-xl bg-[#F2EDE2] flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-[#1B1814]">Accumulated Net Profit</div>
-                  <div className="text-[10px] text-[#8A816F]">Total profit generated from sales</div>
+                  <div className="font-bold text-[#1B1814]">Akumulasi Laba Bersih</div>
+                  <div className="text-[10px] text-[#8A816F]">Total profit yang telah dihasilkan</div>
                 </div>
                 <div className="font-bold text-[#1E5C27] tabular-nums">
                   +{formatRupiahJuta(allTimeNetProfit)}
@@ -470,7 +470,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               </div>
 
               <div className="p-3 rounded-2xl bg-[#EBE5D8] border border-[#DDD5C5] flex items-center justify-between font-bold">
-                <span className="text-[#1B1814]">Total Net Equity:</span>
+                <span className="text-[#1B1814]">Total Ekuitas Bersih:</span>
                 <span className="text-[#1B1814] text-sm tabular-nums">
                   {formatRupiahJuta(totalEkuitas)}
                 </span>
@@ -481,20 +481,20 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
       )}
 
       {/* ========================================================================= */}
-      {/* 3. VIEW: SALES HISTORY                                                    */}
+      {/* 3. VIEW: RIWAYAT PENJUALAN                                                */}
       {/* ========================================================================= */}
       {reportSubTab === 'sales' && (
         <div className="space-y-3.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-display font-bold text-[#7A7264]">
-              Total Transactions: {transactions.length}
+              Total Transaksi: {transactions.length}
             </span>
             <button
               onClick={() => setShowSaleModal(true)}
               className="flex items-center gap-1.5 bg-[#1B1814] text-[#FAF8F5] px-3.5 py-2 rounded-2xl text-xs font-display font-bold hover:bg-[#2E2820] active-press transition-all shadow-sm ring-1 ring-[#C59A3F]/30"
             >
               <Plus className="w-4 h-4 stroke-[2.5] text-[#DFC28F]" />
-              <span>Record Sale</span>
+              <span>Catat Penjualan</span>
             </button>
           </div>
 
@@ -502,7 +502,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             {transactions.length === 0 ? (
               <div className="p-8 text-center rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] text-[#8A816F]">
                 <ArrowRightLeft className="w-8 h-8 mx-auto mb-2 text-[#C7BC9F]" />
-                <div className="text-xs font-mono">No transaction history yet</div>
+                <div className="text-xs font-mono">Belum ada riwayat transaksi</div>
               </div>
             ) : (
               transactions.map((tx) => (
@@ -529,19 +529,19 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
                       <div className="text-xs font-mono font-extrabold text-[#1E5C27] tabular-nums">
                         +{formatRupiah(tx.netProfit)}
                       </div>
-                      <div className="text-[10px] text-[#8A816F] font-mono">Net Profit</div>
+                      <div className="text-[10px] text-[#8A816F] font-mono">Laba Bersih</div>
                     </div>
                   </div>
 
                   <div className="pt-2 border-t border-[#E5DFD3] flex items-center justify-between text-xs">
                     <div className="text-[11px] text-[#7A7264] font-mono tabular-nums">
-                      Sold: {formatRupiah(tx.sellPrice)} | Cost: {formatRupiah(tx.costPrice)}
+                      Terjual: {formatRupiah(tx.sellPrice)} | Modal: {formatRupiah(tx.costPrice)}
                     </div>
                     {tx.customerPhone && (
                       <button
                         onClick={() => openWhatsApp(tx.customerPhone, tx.customerName)}
                         className="p-2 text-[#1E5C27] bg-[#EAF3EA] hover:bg-[#D8EBD9] border border-[#C2E0C7] rounded-xl active-press transition-all"
-                        title="Send WhatsApp"
+                        title="Kirim WhatsApp"
                       >
                         <MessageSquare className="w-4 h-4 stroke-[2.2]" />
                       </button>
@@ -555,20 +555,20 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
       )}
 
       {/* ========================================================================= */}
-      {/* 4. VIEW: CUSTOMER CRM                                                     */}
+      {/* 4. VIEW: DATABASE PELANGGAN (CRM)                                         */}
       {/* ========================================================================= */}
       {reportSubTab === 'customers' && (
         <div className="space-y-3.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-display font-bold text-[#7A7264]">
-              Total Customers: {customers.length}
+              Total Pelanggan: {customers.length}
             </span>
             <button
               onClick={() => setShowCustomerModal(true)}
               className="flex items-center gap-1.5 bg-[#1B1814] text-[#FAF8F5] px-3.5 py-2 rounded-2xl text-xs font-display font-bold hover:bg-[#2E2820] active-press transition-all shadow-sm ring-1 ring-[#C59A3F]/30"
             >
               <UserPlus className="w-4 h-4 stroke-[2.5] text-[#DFC28F]" />
-              <span>Add Customer</span>
+              <span>Tambah Pelanggan</span>
             </button>
           </div>
 
@@ -576,7 +576,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             {customers.length === 0 ? (
               <div className="p-8 text-center rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] text-[#8A816F]">
                 <Users className="w-8 h-8 mx-auto mb-2 text-[#C7BC9F]" />
-                <div className="text-xs font-mono">No customers recorded</div>
+                <div className="text-xs font-mono">Belum ada data pelanggan</div>
               </div>
             ) : (
               customers.map((cust) => (
@@ -588,7 +588,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
                     <h3 className="text-xs font-display font-bold text-[#1B1814]">{cust.name}</h3>
                     <div className="text-[11px] text-[#7A7264] font-mono">{cust.phone || '-'}</div>
                     <div className="text-[10px] text-[#8A816F] font-mono">
-                      Bought: <span className="font-bold text-[#1B1814]">{cust.totalTransactions || 0}x</span> ({formatGram(cust.totalGramsBought || 0)})
+                      Pernah beli: <span className="font-bold text-[#1B1814]">{cust.totalTransactions || 0}x</span> ({formatGram(cust.totalGramsBought || 0)})
                       {cust.address ? ` • ${cust.address}` : ''}
                     </div>
                   </div>
@@ -597,7 +597,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
                     <button
                       onClick={() => openWhatsApp(cust.phone, cust.name)}
                       className="p-2 text-[#1E5C27] bg-[#EAF3EA] hover:bg-[#D8EBD9] border border-[#C2E0C7] rounded-xl active-press transition-all"
-                      title="Send WhatsApp"
+                      title="Kirim WhatsApp"
                     >
                       <MessageSquare className="w-4 h-4 stroke-[2.2]" />
                     </button>
@@ -609,15 +609,15 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
         </div>
       )}
 
-      {/* Modal: Record Sale */}
+      {/* Modal: Catat Penjualan */}
       <Modal
         isOpen={showSaleModal}
         onClose={() => setShowSaleModal(false)}
-        title="Record Gold Sale"
+        title="Catat Penjualan Emas"
       >
         <form onSubmit={handleSaveSale} className="space-y-3.5 text-xs">
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Select Gold Item *</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Pilih Stok Emas *</label>
             <select
               required
               value={saleForm.inventoryId}
@@ -632,10 +632,10 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               }}
               className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
             >
-              <option value="">-- Select Ready Stock --</option>
+              <option value="">-- Pilih Stok Ready --</option>
               {readyInventory.map(item => (
                 <option key={item.id} value={item.id}>
-                  {item.title} ({formatGram(item.weight)}) — Cost: {formatRupiah(item.totalBuyPrice)}
+                  {item.title} ({formatGram(item.weight)}) — Modal: {formatRupiah(item.totalBuyPrice)}
                 </option>
               ))}
             </select>
@@ -643,11 +643,11 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
 
           <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Customer Name *</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Nama Pembeli *</label>
               <input
                 type="text"
                 required
-                placeholder="e.g. Bu Sri / Mbak Nurul"
+                placeholder="Contoh: Bu Sri / Mbak Nurul"
                 value={saleForm.customerName}
                 onChange={(e) => {
                   const val = e.target.value;
@@ -663,7 +663,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             </div>
 
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">WhatsApp Number</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Nomor WhatsApp</label>
               <input
                 type="tel"
                 placeholder="0812xxxx"
@@ -676,7 +676,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
 
           <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Sale Date *</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Tanggal Jual *</label>
               <input
                 type="date"
                 required
@@ -687,22 +687,22 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             </div>
 
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Payment Method</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Metode Pembayaran</label>
               <select
                 value={saleForm.paymentMethod}
                 onChange={(e) => setSaleForm({ ...saleForm, paymentMethod: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
               >
                 <option value="Cash COD">Cash COD</option>
-                <option value="Bank Transfer">Bank Transfer</option>
-                <option value="DP + Settlement">DP + Settlement</option>
+                <option value="Transfer Bank">Transfer Bank</option>
+                <option value="DP + Pelunasan">DP + Pelunasan</option>
               </select>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Sale Price (Rp) *</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Harga Jual (Rp) *</label>
               <input
                 type="number"
                 required
@@ -713,7 +713,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             </div>
 
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">COD / Delivery Fee (Rp)</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Biaya COD / Kurir (Rp)</label>
               <input
                 type="number"
                 value={saleForm.operationalFee}
@@ -726,11 +726,11 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
           {/* Profit Preview */}
           <div className="p-3.5 bg-[#F2EDE2] rounded-2xl border border-[#E5DFD3] space-y-1 font-mono">
             <div className="flex justify-between text-[#8A816F]">
-              <span>Cost:</span>
+              <span>Modal Beli:</span>
               <span className="tabular-nums">{formatRupiah(currentCost)}</span>
             </div>
             <div className="flex justify-between font-bold text-sm text-[#1B1814] pt-1 border-t border-[#E5DFD3]">
-              <span>Net Profit:</span>
+              <span>Laba Bersih:</span>
               <span className="text-[#1E5C27] tabular-nums">
                 +{formatRupiah(profitMetrics.netProfit)} ({profitMetrics.marginPercent}%)
               </span>
@@ -741,24 +741,24 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             type="submit"
             className="w-full py-3.5 bg-[#1B1814] text-[#FAF8F5] font-display font-bold rounded-2xl text-xs hover:bg-[#2E2820] transition-all mt-2 active-press ring-1 ring-[#C59A3F]/30"
           >
-            Save Sale Transaction
+            Simpan Transaksi Penjualan
           </button>
         </form>
       </Modal>
 
-      {/* Modal: Add Customer */}
+      {/* Modal: Tambah Pelanggan */}
       <Modal
         isOpen={showCustomerModal}
         onClose={() => setShowCustomerModal(false)}
-        title="Add Customer"
+        title="Tambah Pelanggan Baru"
       >
         <form onSubmit={handleSaveCustomer} className="space-y-3.5 text-xs">
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Name *</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Nama Pelanggan *</label>
             <input
               type="text"
               required
-              placeholder="e.g. Bu Sri Wahyuni"
+              placeholder="Contoh: Bu Sri Wahyuni"
               value={custForm.name}
               onChange={(e) => setCustForm({ ...custForm, name: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
@@ -766,7 +766,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">WhatsApp *</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Nomor WhatsApp *</label>
             <input
               type="tel"
               required
@@ -778,10 +778,10 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Address</label>
+            <label className="block font-bold text-[#1B1814] mb-1">Alamat / Domisili</label>
             <input
               type="text"
-              placeholder="District / Landmark"
+              placeholder="Kecamatan / Patokan"
               value={custForm.address}
               onChange={(e) => setCustForm({ ...custForm, address: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
@@ -792,7 +792,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             type="submit"
             className="w-full py-3.5 bg-[#1B1814] text-[#FAF8F5] font-display font-bold rounded-2xl text-xs hover:bg-[#2E2820] transition-all mt-2 active-press ring-1 ring-[#C59A3F]/30"
           >
-            Save Customer
+            Simpan Pelanggan
           </button>
         </form>
       </Modal>
