@@ -346,25 +346,6 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
               </div>
             </div>
           </div>
-
-          {/* 5. Action Buttons (Branded Gold & Tactile) */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => onNavigateTab('inventory')}
-              className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#1B1814] to-[#2B2317] text-[#FAF8F5] text-xs font-display font-bold hover:from-[#2B2317] hover:to-[#382E1E] active-press transition-all shadow-sm ring-2 ring-[#D4AF37]/50"
-            >
-              <Plus className="w-4 h-4 stroke-[2.8] text-[#E5C378]" />
-              <span className="text-[#FAF8F5]">Beli Stok</span>
-            </button>
-
-            <button
-              onClick={() => onNavigateTab('reports')}
-              className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-gradient-to-br from-[#FFFDF8] via-[#FAF3DE] to-[#F2E3B8] text-[#1B1814] border-2 border-[#D4AF37]/70 text-xs font-display font-bold hover:border-[#D4AF37] active-press transition-all shadow-sm"
-            >
-              <ArrowRightLeft className="w-4 h-4 stroke-[2.8] text-[#876618]" />
-              <span>Jual Emas</span>
-            </button>
-          </div>
         </div>
       )}
 

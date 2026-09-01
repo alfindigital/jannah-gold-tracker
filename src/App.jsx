@@ -36,8 +36,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#F6F3EC] text-[#1B1814] flex flex-col font-sans">
-      {/* Top Header */}
-      <Header />
+      {/* Top Header with Quick Action Buttons */}
+      <Header 
+        onAddStock={() => setActiveTab('inventory')}
+        onSellGold={() => setActiveTab('reports')}
+      />
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-md w-full mx-auto px-4 pt-3 pb-16">
