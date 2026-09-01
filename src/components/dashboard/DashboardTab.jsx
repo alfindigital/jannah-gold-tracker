@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db/db';
-import { formatRupiah, formatRupiahJuta, formatGram, formatDateIndo, formatDateTimeIndo } from '../../services/calculationService';
+import { formatRupiah, formatRupiahJuta, formatJuta, formatGram, formatDateIndo, formatDateTimeIndo } from '../../services/calculationService';
 import { 
   TrendingUp, 
   Layers, 
@@ -154,8 +154,8 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
                     </div>
                     <div className="text-right shrink-0">
                       <Badge status={item.status} />
-                      <div className="text-xs font-mono font-bold text-[#1B1814] mt-1 tabular-nums">
-                        {formatRupiahJuta(item.totalBuyPrice)}
+                      <div className="text-xs font-mono font-bold text-[#1B1814] mt-1 tabular-nums whitespace-nowrap">
+                        {formatJuta(item.totalBuyPrice)}
                       </div>
                     </div>
                   </div>
@@ -216,8 +216,8 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
                     </div>
 
                     {item.targetAmount > 0 && (
-                      <div className="text-right font-mono font-bold text-xs text-[#1B1814] tabular-nums">
-                        {formatRupiahJuta(item.targetAmount)}
+                      <div className="text-right font-mono font-bold text-xs text-[#1B1814] tabular-nums shrink-0 whitespace-nowrap">
+                        {formatJuta(item.targetAmount)}
                       </div>
                     )}
                   </div>
