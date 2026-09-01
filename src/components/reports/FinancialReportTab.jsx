@@ -199,13 +199,13 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
       </div>
 
       {/* Segment Tabs: Profit & Loss | Balance Sheet | Sales History | Customers */}
-      <div className="grid grid-cols-4 p-1 bg-[#EBE5D8] rounded-2xl font-display font-bold text-xs">
+      <div className="grid grid-cols-4 p-1.5 bg-[#EAE2D2] rounded-2xl font-display font-bold text-xs border border-[#DDD3BF]">
         <button
           onClick={() => setReportSubTab('pnl')}
           className={`py-2 rounded-xl transition-all ${
             reportSubTab === 'pnl'
-              ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
-              : 'text-[#7A7264] hover:text-[#1B1814]'
+              ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+              : 'text-[#6E604A] hover:text-[#1B1814]'
           }`}
         >
           P&L
@@ -214,8 +214,8 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
           onClick={() => setReportSubTab('balance')}
           className={`py-2 rounded-xl transition-all ${
             reportSubTab === 'balance'
-              ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
-              : 'text-[#7A7264] hover:text-[#1B1814]'
+              ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+              : 'text-[#6E604A] hover:text-[#1B1814]'
           }`}
         >
           Balance
@@ -224,8 +224,8 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
           onClick={() => setReportSubTab('sales')}
           className={`py-2 rounded-xl transition-all ${
             reportSubTab === 'sales'
-              ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
-              : 'text-[#7A7264] hover:text-[#1B1814]'
+              ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+              : 'text-[#6E604A] hover:text-[#1B1814]'
           }`}
         >
           Sales
@@ -234,8 +234,8 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
           onClick={() => setReportSubTab('customers')}
           className={`py-2 rounded-xl transition-all ${
             reportSubTab === 'customers'
-              ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
-              : 'text-[#7A7264] hover:text-[#1B1814]'
+              ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+              : 'text-[#6E604A] hover:text-[#1B1814]'
           }`}
         >
           CRM

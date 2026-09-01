@@ -90,14 +90,14 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
 
   return (
     <div className="space-y-4 pb-20">
-      {/* Segment Switcher: Overview | Profit & Loss | Balance Sheet */}
-      <div className="grid grid-cols-3 p-1 bg-[#EBE5D8] rounded-2xl font-display font-bold text-xs">
+      {/* Top Segment Tabs: Overview | Profit & Loss | Balance Sheet */}
+      <div className="grid grid-cols-3 p-1.5 bg-[#EAE2D2] rounded-2xl font-display font-bold text-xs border border-[#DDD3BF]">
         <button
           onClick={() => setDashboardView('summary')}
           className={`py-2 rounded-xl transition-all ${
             dashboardView === 'summary'
-              ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
-              : 'text-[#7A7264] hover:text-[#1B1814]'
+              ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+              : 'text-[#6E604A] hover:text-[#1B1814]'
           }`}
         >
           Overview
@@ -106,8 +106,8 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
           onClick={() => setDashboardView('pnl')}
           className={`py-2 rounded-xl transition-all ${
             dashboardView === 'pnl'
-              ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
-              : 'text-[#7A7264] hover:text-[#1B1814]'
+              ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+              : 'text-[#6E604A] hover:text-[#1B1814]'
           }`}
         >
           Profit & Loss
@@ -116,8 +116,8 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
           onClick={() => setDashboardView('balance')}
           className={`py-2 rounded-xl transition-all ${
             dashboardView === 'balance'
-              ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs'
-              : 'text-[#7A7264] hover:text-[#1B1814]'
+              ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+              : 'text-[#6E604A] hover:text-[#1B1814]'
           }`}
         >
           Balance Sheet
@@ -129,54 +129,62 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
       {/* ========================================================================= */}
       {dashboardView === 'summary' && (
         <div className="space-y-3.5">
-          {/* 1. Core Financial 2x2 Bento Cards (Concise, High-Contrast) */}
+          {/* 1. Core Financial 2x2 Bento Cards (Branded Luxury Gold) */}
           <div className="grid grid-cols-2 gap-3">
-            {/* Card 1: Net Profit */}
-            <div className="p-4 rounded-3xl bg-white border-2 border-[#DCD5C5] space-y-2 shadow-sm">
+            {/* Card 1: Net Profit (Royal Gold Signature) */}
+            <div className="p-4 rounded-3xl bg-gradient-to-br from-[#FFFDF8] via-[#FAF3DE] to-[#F2E3B8] border-2 border-[#D4AF37]/60 space-y-2 shadow-[0_4px_20px_rgba(212,175,55,0.12)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-extrabold text-[#1B1814] uppercase tracking-wider">Net Profit</span>
-                <TrendingUp className="w-5 h-5 text-[#1B1814] stroke-[2.4]" />
+                <span className="text-xs font-mono font-extrabold text-[#876618] uppercase tracking-wider">Net Profit</span>
+                <div className="p-1.5 rounded-xl bg-[#E8C66B]/30 text-[#876618]">
+                  <TrendingUp className="w-4 h-4 stroke-[2.8]" />
+                </div>
               </div>
-              <div className="text-2xl font-display font-black text-[#0A0908] tracking-tight tabular-nums">
+              <div className="text-2xl font-display font-black text-[#1A160F] tracking-tight tabular-nums">
                 {formatRupiahJuta(allTimeNetProfit)}
               </div>
             </div>
 
-            {/* Card 2: Total Ready Stock */}
+            {/* Card 2: Total Ready Stock (Champagne Gold Bullion) */}
             <div 
               onClick={() => onNavigateTab('inventory')}
-              className="p-4 rounded-3xl bg-white border-2 border-[#DCD5C5] space-y-2 shadow-sm cursor-pointer hover:border-[#1B1814] transition-all active-press"
+              className="p-4 rounded-3xl bg-gradient-to-br from-[#FFFDFB] via-[#FAF5EA] to-[#F3EAD7] border-2 border-[#D8BC86]/70 space-y-2 shadow-[0_4px_16px_rgba(197,154,63,0.10)] cursor-pointer hover:border-[#B88E33] transition-all active-press"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-extrabold text-[#1B1814] uppercase tracking-wider">Ready Stock</span>
-                <Layers className="w-5 h-5 text-[#1B1814] stroke-[2.4]" />
+                <span className="text-xs font-mono font-extrabold text-[#946F22] uppercase tracking-wider">Ready Stock</span>
+                <div className="p-1.5 rounded-xl bg-[#E8D1A0]/35 text-[#946F22]">
+                  <Layers className="w-4 h-4 stroke-[2.8]" />
+                </div>
               </div>
-              <div className="text-2xl font-display font-black text-[#0A0908] tracking-tight tabular-nums">
+              <div className="text-2xl font-display font-black text-[#1A160F] tracking-tight tabular-nums">
                 {formatGram(totalGramasiReady)}
               </div>
             </div>
 
-            {/* Card 3: Capital Invested */}
-            <div className="p-4 rounded-3xl bg-white border-2 border-[#DCD5C5] space-y-2 shadow-sm">
+            {/* Card 3: Capital Invested (Sand Gold Reserve) */}
+            <div className="p-4 rounded-3xl bg-gradient-to-br from-[#FCFBF8] via-[#F6F2E7] to-[#EBE4D2] border-2 border-[#C9B996]/70 space-y-2 shadow-[0_4px_16px_rgba(138,114,64,0.08)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-extrabold text-[#1B1814] uppercase tracking-wider">Total Cost</span>
-                <Wallet className="w-5 h-5 text-[#1B1814] stroke-[2.4]" />
+                <span className="text-xs font-mono font-extrabold text-[#756447] uppercase tracking-wider">Total Cost</span>
+                <div className="p-1.5 rounded-xl bg-[#DECFA9]/35 text-[#756447]">
+                  <Wallet className="w-4 h-4 stroke-[2.8]" />
+                </div>
               </div>
-              <div className="text-2xl font-display font-black text-[#0A0908] tracking-tight tabular-nums">
+              <div className="text-2xl font-display font-black text-[#1A160F] tracking-tight tabular-nums">
                 {formatRupiahJuta(totalModalReady)}
               </div>
             </div>
 
-            {/* Card 4: Market Valuation */}
+            {/* Card 4: Market Valuation (Imperial Gold Luster) */}
             <div 
               onClick={onOpenPriceModal}
-              className="p-4 rounded-3xl bg-white border-2 border-[#DCD5C5] space-y-2 shadow-sm cursor-pointer hover:border-[#1B1814] transition-all active-press"
+              className="p-4 rounded-3xl bg-gradient-to-br from-[#FFFDF5] via-[#FCF2D2] to-[#F8E5A7] border-2 border-[#E8BF48]/80 space-y-2 shadow-[0_4px_20px_rgba(232,191,72,0.18)] cursor-pointer hover:border-[#C79718] transition-all active-press"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-extrabold text-[#1B1814] uppercase tracking-wider">Market Value</span>
-                <ArrowUpRight className="w-5 h-5 text-[#1B1814] stroke-[2.4]" />
+                <span className="text-xs font-mono font-extrabold text-[#8A5F0C] uppercase tracking-wider">Market Value</span>
+                <div className="p-1.5 rounded-xl bg-[#FCE389]/45 text-[#8A5F0C]">
+                  <ArrowUpRight className="w-4 h-4 stroke-[2.8]" />
+                </div>
               </div>
-              <div className="text-2xl font-display font-black text-[#0A0908] tracking-tight tabular-nums">
+              <div className="text-2xl font-display font-black text-[#1A160F] tracking-tight tabular-nums">
                 {formatRupiahJuta(estimasiValuasiPasar)}
               </div>
             </div>
@@ -335,21 +343,21 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
             </div>
           </div>
 
-          {/* 5. Action Buttons (Bold, High Contrast, Tactile) */}
+          {/* 5. Action Buttons (Branded Gold & Tactile) */}
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => onNavigateTab('inventory')}
-              className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-[#1B1814] text-[#FAF8F5] text-xs font-display font-bold hover:bg-[#2E2820] active-press transition-all shadow-sm ring-1 ring-[#C59A3F]/30"
+              className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#1B1814] to-[#2B2317] text-[#FAF8F5] text-xs font-display font-bold hover:from-[#2B2317] hover:to-[#382E1E] active-press transition-all shadow-sm ring-2 ring-[#D4AF37]/50"
             >
-              <Plus className="w-4 h-4 stroke-[2.5] text-[#DFC28F]" />
-              <span>Buy Stock</span>
+              <Plus className="w-4 h-4 stroke-[2.8] text-[#E5C378]" />
+              <span className="text-[#FAF8F5]">Buy Stock</span>
             </button>
 
             <button
               onClick={() => onNavigateTab('reports')}
-              className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-[#FAF8F5] text-[#1B1814] border border-[#E5DFD3] text-xs font-display font-bold hover:bg-[#F2EDE2] active-press transition-all shadow-sm"
+              className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-gradient-to-br from-[#FFFDF8] via-[#FAF3DE] to-[#F2E3B8] text-[#1B1814] border-2 border-[#D4AF37]/70 text-xs font-display font-bold hover:border-[#D4AF37] active-press transition-all shadow-sm"
             >
-              <ArrowRightLeft className="w-4 h-4 stroke-[2.5] text-[#A27B2C]" />
+              <ArrowRightLeft className="w-4 h-4 stroke-[2.8] text-[#876618]" />
               <span>Sell Gold</span>
             </button>
           </div>

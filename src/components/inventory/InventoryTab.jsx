@@ -131,7 +131,7 @@ export default function InventoryTab({ onQuickSell }) {
               onClick={() => setFilterStatus(f.id)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-display font-bold transition-all ${
                 filterStatus === f.id
-                  ? 'bg-[#1B1814] text-[#FAF8F5] shadow-xs ring-1 ring-[#C59A3F]/30'
+                  ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
                   : 'bg-[#FAF8F5] text-[#7A7264] border border-[#E5DFD3] hover:bg-[#F2EDE2]'
               }`}
             >
