@@ -192,10 +192,10 @@ export async function seedInitialData() {
     createdAt: new Date(Date.now() - 4 * 86400000).toISOString()
   });
 
-  // 5. Initial Schedules (COD & Kulakan)
+  // 5. Initial Schedules (Antar & Kulakan)
   await db.schedules.add({
     type: SCHEDULE_TYPE.COD,
-    title: 'COD Antam 5g - Bu Sri Wahyuni',
+    title: 'Antam 5g - Bu Sri Wahyuni',
     date: todayStr, // Hari ini!
     time: '16:30',
     location: 'Alun-alun Purbalingga (Dekat Air Mancur)',
@@ -210,7 +210,7 @@ export async function seedInitialData() {
   const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
   await db.schedules.add({
     type: SCHEDULE_TYPE.COD,
-    title: 'COD UBS 2g - Mbak Nurul',
+    title: 'UBS 2g - Mbak Nurul',
     date: tomorrowStr,
     time: '10:00',
     location: 'Depan Alfamart Kalikabong',

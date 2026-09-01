@@ -63,15 +63,24 @@ export function formatGram(gram) {
   return `${Number(gram).toLocaleString('id-ID', { maximumFractionDigits: 2 })}g`;
 }
 
+// Strict DD/MM/YY date format (e.g. 01/09/26)
 export function formatDateIndo(dateStr) {
   if (!dateStr) return '-';
   try {
+    // If it's YYYY-MM-DD string, parse directly to avoid timezone shift
+    if (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+      const parts = dateStr.split('T')[0].split('-');
+      const year = parts[0].slice(-2);
+      const month = parts[1];
+      const day = parts[2];
+      return `${day}/${month}/${year}`;
+    }
     const d = new Date(dateStr);
-    return new Intl.DateTimeFormat('id-ID', {
-      day: 'numeric',
-      month: 'short',
-      year: '2-digit'
-    }).format(d);
+    if (isNaN(d.getTime())) return dateStr;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = String(d.getFullYear()).slice(-2);
+    return `${day}/${month}/${year}`;
   } catch (e) {
     return dateStr;
   }
@@ -79,7 +88,7 @@ export function formatDateIndo(dateStr) {
 
 export function formatDateTimeIndo(dateStr, timeStr) {
   const d = formatDateIndo(dateStr);
-  return timeStr ? `${d}, ${timeStr}` : d;
+  return timeStr ? `${d} • ${timeStr}` : d;
 }
 
 export function calculateNetProfit(sellPrice, costPrice, operationalFee = 0) {

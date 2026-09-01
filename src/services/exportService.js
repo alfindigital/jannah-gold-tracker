@@ -67,7 +67,7 @@ export function exportFinancialReportToExcel({
 
   // Sheet 3: Riwayat Penjualan
   const txData = [
-    ['Tanggal', 'Nama Barang', 'Berat (g)', 'Nama Pembeli', 'Harga Jual (Rp)', 'Modal Beli (Rp)', 'Biaya COD (Rp)', 'Laba Bersih (Rp)', 'Metode Pembayaran']
+    ['Tanggal', 'Nama Barang', 'Berat (g)', 'Nama Pembeli', 'Harga Jual (Rp)', 'Modal Beli (Rp)', 'Biaya Kurir (Rp)', 'Laba Bersih (Rp)', 'Metode Pembayaran']
   ];
   transactions.forEach(tx => {
     txData.push([

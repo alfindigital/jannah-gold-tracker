@@ -693,7 +693,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
                 onChange={(e) => setSaleForm({ ...saleForm, paymentMethod: e.target.value })}
                 className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
               >
-                <option value="Cash COD">Cash COD</option>
+                <option value="Tunai">Tunai Langsung</option>
                 <option value="Transfer Bank">Transfer Bank</option>
                 <option value="DP + Pelunasan">DP + Pelunasan</option>
               </select>
@@ -713,7 +713,7 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
             </div>
 
             <div>
-              <label className="block font-bold text-[#1B1814] mb-1">Biaya COD / Kurir (Rp)</label>
+              <label className="block font-bold text-[#1B1814] mb-1">Biaya Ongkir / Kurir (Rp)</label>
               <input
                 type="number"
                 value={saleForm.operationalFee}

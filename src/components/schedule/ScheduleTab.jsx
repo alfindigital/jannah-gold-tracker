@@ -39,7 +39,7 @@ export default function ScheduleTab() {
 
   const handleSaveSchedule = async (e) => {
     e.preventDefault();
-    const cleanTitle = (formData.title || '').replace(/^Jadwal\s+/i, '');
+    const cleanTitle = (formData.title || '').replace(/^(Jadwal|COD)\s+/i, '');
 
     await db.schedules.add({
       title: cleanTitle,
@@ -117,8 +117,8 @@ export default function ScheduleTab() {
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
         {[
           { id: 'all', label: 'Semua' },
-          { id: SCHEDULE_TYPE.COD, label: 'Antar (COD)' },
-          { id: SCHEDULE_TYPE.KULAKAN, label: 'Beli (Kulakan)' }
+          { id: SCHEDULE_TYPE.COD, label: 'Antar' },
+          { id: SCHEDULE_TYPE.KULAKAN, label: 'Beli' }
         ].map(f => (
           <button
             key={f.id}
@@ -143,7 +143,9 @@ export default function ScheduleTab() {
           </div>
         ) : (
           filteredSchedules.map((item) => {
-            const displayTitle = (item.title || '').replace(/^Jadwal\s+/i, '');
+            const displayTitle = (item.title || '')
+              .replace(/^Jadwal\s+/i, '')
+              .replace(/^COD\s+/i, '');
 
             return (
               <div
@@ -178,7 +180,7 @@ export default function ScheduleTab() {
                   {item.targetAmount > 0 && (
                     <div className="text-right shrink-0 bg-[#F2EDE2] px-2.5 py-1.5 rounded-xl border border-[#E5DFD3]">
                       <div className="text-[9px] text-[#8A816F] font-semibold">
-                        {item.type === SCHEDULE_TYPE.KULAKAN ? 'BUDGET' : 'TOTAL COD'}
+                        {item.type === SCHEDULE_TYPE.KULAKAN ? 'BUDGET' : 'NOMINAL'}
                       </div>
                       <div className="text-xs font-mono font-extrabold text-[#1B1814] tabular-nums">
                         {formatRupiah(item.targetAmount)}
@@ -269,7 +271,7 @@ export default function ScheduleTab() {
                     : 'text-[#7A7264] hover:text-[#1B1814]'
                 }`}
               >
-                Antar (COD)
+                Antar
               </button>
               <button
                 type="button"
@@ -280,7 +282,7 @@ export default function ScheduleTab() {
                     : 'text-[#7A7264] hover:text-[#1B1814]'
                 }`}
               >
-                Beli (Kulakan)
+                Beli
               </button>
             </div>
           </div>
@@ -290,7 +292,7 @@ export default function ScheduleTab() {
             <input
               type="text"
               required
-              placeholder={formData.type === SCHEDULE_TYPE.COD ? "Contoh: COD Antam 2g Bu Siti" : "Contoh: Kulakan Butik Antam"}
+              placeholder={formData.type === SCHEDULE_TYPE.COD ? "Contoh: Antam 5g Bu Siti" : "Contoh: Butik Antam"}
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-white border border-[#E5DFD3] rounded-xl text-[#1B1814] focus:outline-none focus:border-[#C59A3F] font-sans"
