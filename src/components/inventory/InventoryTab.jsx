@@ -235,7 +235,7 @@ export default function InventoryTab({ onQuickSell }) {
               >
                 <option value="Antam">Antam</option>
                 <option value="UBS">UBS</option>
-                <option value="Galeri 24">Galeri 24</option>
+                <option value="G24">G24</option>
                 <option value="Hartadinata">Hartadinata</option>
                 <option value="Lotus Archi">Lotus Archi</option>
                 <option value="Perhiasan">Perhiasan</option>

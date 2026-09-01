@@ -107,8 +107,8 @@ export async function seedInitialData() {
   });
 
   const inv4 = await db.inventory.add({
-    title: 'Galeri 24 Baby Gold 0.5 Gram',
-    brand: 'Galeri 24',
+    title: 'G24 Baby Gold 0.5 Gram',
+    brand: 'G24',
     type: 'Batangan (LM)',
     weight: 0.5,
     purity: '24K / 99.99%',
@@ -231,7 +231,7 @@ export async function seedInitialData() {
     location: 'Butik Emas LM / Toko Supplier Utama',
     targetAmount: 25000000, // Budget 25jt
     status: SCHEDULE_STATUS.PENDING,
-    notes: 'Target beli: Antam 1g x 10 keping, UBS 2g x 3 keping, Galeri 24 Baby Gold',
+    notes: 'Target beli: Antam 1g x 10 keping, UBS 2g x 3 keping, G24 Baby Gold',
     createdAt: new Date().toISOString()
   });
 }

@@ -73,7 +73,7 @@ export default function GoldPriceModal({ isOpen, onClose }) {
           </div>
 
           <div>
-            <label className="block font-bold text-[#1B1814] mb-1">Galeri 24 / Lainnya 1 Gram (Rp)</label>
+            <label className="block font-bold text-[#1B1814] mb-1">G24 / Lainnya 1 Gram (Rp)</label>
             <input
               type="number"
               value={prices.galeri24_1g}
