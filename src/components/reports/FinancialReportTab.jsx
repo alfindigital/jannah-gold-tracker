@@ -183,62 +183,57 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
 
   return (
     <div className="space-y-4 pb-2">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-display font-extrabold text-[#1B1814] tracking-tight">
-          Laporan Keuangan
-        </h2>
+      {/* Segment Tabs + Excel Export Button in 1 clean row */}
+      <div className="flex items-center gap-2">
+        <div className="flex-1 grid grid-cols-4 p-1.5 bg-[#EAE2D2] rounded-2xl font-display font-bold text-xs border border-[#DDD3BF]">
+          <button
+            onClick={() => setReportSubTab('pnl')}
+            className={`py-2 rounded-xl transition-all ${
+              reportSubTab === 'pnl'
+                ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+                : 'text-[#6E604A] hover:text-[#1B1814]'
+            }`}
+          >
+            Laba Rugi
+          </button>
+          <button
+            onClick={() => setReportSubTab('balance')}
+            className={`py-2 rounded-xl transition-all ${
+              reportSubTab === 'balance'
+                ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+                : 'text-[#6E604A] hover:text-[#1B1814]'
+            }`}
+          >
+            Neraca
+          </button>
+          <button
+            onClick={() => setReportSubTab('sales')}
+            className={`py-2 rounded-xl transition-all ${
+              reportSubTab === 'sales'
+                ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+                : 'text-[#6E604A] hover:text-[#1B1814]'
+            }`}
+          >
+            Penjualan
+          </button>
+          <button
+            onClick={() => setReportSubTab('customers')}
+            className={`py-2 rounded-xl transition-all ${
+              reportSubTab === 'customers'
+                ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
+                : 'text-[#6E604A] hover:text-[#1B1814]'
+            }`}
+          >
+            Pelanggan
+          </button>
+        </div>
+
         <button
           onClick={handleExportExcel}
-          className="flex items-center gap-1.5 px-3 py-2 bg-[#1B1814] text-[#DFC28F] rounded-2xl text-xs font-display font-bold hover:bg-[#2E2820] active-press shadow-xs ring-1 ring-[#C59A3F]/30"
+          className="w-9 h-9 rounded-2xl bg-[#1B1814] text-[#DFC28F] flex items-center justify-center hover:bg-[#2E2820] active-press shadow-xs ring-1 ring-[#C59A3F]/30 shrink-0"
           title="Unduh Laporan Excel"
         >
-          <Download className="w-3.5 h-3.5 stroke-[2.5]" />
-          <span>Excel</span>
-        </button>
-      </div>
-
-      {/* Segment Tabs: Laba Rugi | Neraca | Penjualan | Pelanggan */}
-      <div className="grid grid-cols-4 p-1.5 bg-[#EAE2D2] rounded-2xl font-display font-bold text-xs border border-[#DDD3BF]">
-        <button
-          onClick={() => setReportSubTab('pnl')}
-          className={`py-2 rounded-xl transition-all ${
-            reportSubTab === 'pnl'
-              ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
-              : 'text-[#6E604A] hover:text-[#1B1814]'
-          }`}
-        >
-          Laba Rugi
-        </button>
-        <button
-          onClick={() => setReportSubTab('balance')}
-          className={`py-2 rounded-xl transition-all ${
-            reportSubTab === 'balance'
-              ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
-              : 'text-[#6E604A] hover:text-[#1B1814]'
-          }`}
-        >
-          Neraca
-        </button>
-        <button
-          onClick={() => setReportSubTab('sales')}
-          className={`py-2 rounded-xl transition-all ${
-            reportSubTab === 'sales'
-              ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
-              : 'text-[#6E604A] hover:text-[#1B1814]'
-          }`}
-        >
-          Penjualan
-        </button>
-        <button
-          onClick={() => setReportSubTab('customers')}
-          className={`py-2 rounded-xl transition-all ${
-            reportSubTab === 'customers'
-              ? 'bg-[#1B1814] text-[#E5C378] shadow-md ring-1 ring-[#D4AF37]/60'
-              : 'text-[#6E604A] hover:text-[#1B1814]'
-          }`}
-        >
-          Pelanggan
+          <Download className="w-4 h-4 stroke-[2.5]" />
         </button>
       </div>
 
