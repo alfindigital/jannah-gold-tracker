@@ -201,15 +201,17 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
                         </span>
                         <Badge status={item.status} />
                       </div>
-                      <div className="text-[11px] text-[#7A7264] flex items-center gap-3 font-mono">
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 stroke-[2]" />
-                          {formatDateTimeIndo(item.date, item.time)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-3.5 h-3.5 stroke-[2]" />
-                          {item.location}
-                        </span>
+                      <div className="text-[11px] text-[#7A7264] font-mono space-y-0.5">
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5 stroke-[2] shrink-0 text-[#8A816F]" />
+                          <span>{formatDateTimeIndo(item.date, item.time)}</span>
+                        </div>
+                        {item.location && (
+                          <div className="flex items-center gap-1 text-[#6E604A]">
+                            <MapPin className="w-3.5 h-3.5 stroke-[2] shrink-0 text-[#8A816F]" />
+                            <span className="truncate">{item.location}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
