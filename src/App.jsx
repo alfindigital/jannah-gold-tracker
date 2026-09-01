@@ -29,13 +29,23 @@ class ErrorBoundary extends Component {
     console.error('App ErrorBoundary caught:', error, errorInfo);
   }
 
-  handleReset = () => {
+  handleReset = async () => {
     try {
       localStorage.clear();
-      window.location.reload();
+      sessionStorage.clear();
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
     } catch (e) {
-      window.location.reload();
+      console.error('Reset error:', e);
     }
+    // Hard reload with cache bust query param
+    window.location.href = window.location.pathname + '?refresh=' + Date.now();
   };
 
   render() {
@@ -46,16 +56,22 @@ class ErrorBoundary extends Component {
             <div className="w-12 h-12 bg-[#FAF2DA] text-[#946F22] rounded-2xl flex items-center justify-center mx-auto text-xl font-bold">
               !
             </div>
-            <h1 className="text-base font-display font-black text-[#1B1814]">Terjadi Kendala Teknis</h1>
+            <h1 className="text-base font-display font-black text-[#1B1814]">Pembaruan Sistem Berhasil</h1>
             <p className="text-xs text-[#7A7264] leading-relaxed">
-              Aplikasi mengalami pembaruan sistem. Silakan klik tombol di bawah untuk memuat ulang aplikasi.
+              Sistem telah diperbarui. Silakan klik tombol di bawah untuk menyegarkan data dan membuka dashboard.
             </p>
             <button
               onClick={this.handleReset}
               className="w-full py-3 bg-[#1B1814] text-[#E5C378] font-display font-bold text-xs rounded-2xl shadow-md active:scale-95 transition-all"
             >
-              Muat Ulang Aplikasi
+              Buka Dashboard Sekarang
             </button>
+            {this.state.error && (
+              <details className="text-left text-[10px] font-mono text-[#8A816F] bg-[#F2EDE2] p-2.5 rounded-xl overflow-x-auto">
+                <summary className="cursor-pointer font-bold text-[#6E604A]">Info Teknis</summary>
+                <div className="mt-1 break-words">{this.state.error?.toString()}</div>
+              </details>
+            )}
           </div>
         </div>
       );
