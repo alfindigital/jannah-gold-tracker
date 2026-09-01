@@ -404,6 +404,23 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
             </div>
           </div>
 
+          {/* Stats: Total Terjual & Rata-rata Laba / Gram at the Top */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3.5 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-0.5 shadow-xs">
+              <div className="text-[10px] font-mono text-[#8A816F] uppercase font-bold">Total Terjual</div>
+              <div className="text-xl font-display font-extrabold text-[#1B1814] tabular-nums">
+                {formatGram(totalGramsSold)}
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-0.5 shadow-xs">
+              <div className="text-[10px] font-mono text-[#8A816F] uppercase font-bold">Laba / Gram</div>
+              <div className="text-xl font-display font-extrabold text-[#1B1814] tabular-nums">
+                {formatRupiah(avgProfitPerGram).replace('Rp', 'Rp ')}
+              </div>
+            </div>
+          </div>
+
           {/* Step-by-Step Waterfall Calculation */}
           <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-3 shadow-xs">
             <div className="flex items-center gap-2 border-b border-[#E5DFD3] pb-2.5">
@@ -450,7 +467,7 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F2EDE2]">
                 <div>
                   <div className="font-bold text-[#1B1814]">Biaya Operasional & Kurir</div>
-                  <div className="text-[10px] text-[#8A816F]">Ongkir, bensin COD & admin</div>
+                  <div className="text-[10px] text-[#8A816F]">Ongkir, bensin & admin</div>
                 </div>
                 <div className="font-bold text-rose-700 tabular-nums">
                   - {formatRupiah(totalOperational)}
@@ -466,25 +483,6 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal }) {
                   +{formatRupiahJuta(totalNetProfit)}
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Efficiency Metrics */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-1 shadow-xs">
-              <div className="text-[10px] font-mono text-[#8A816F] uppercase">Total Terjual</div>
-              <div className="text-lg font-display font-extrabold text-[#1B1814] tabular-nums">
-                {formatGram(totalGramsSold)}
-              </div>
-              <div className="text-[10px] text-[#8A816F] font-mono">Emas fisik keluar</div>
-            </div>
-
-            <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-1 shadow-xs">
-              <div className="text-[10px] font-mono text-[#8A816F] uppercase">Rata-rata Laba / Gram</div>
-              <div className="text-lg font-display font-extrabold text-[#1B1814] tabular-nums">
-                {formatRupiah(avgProfitPerGram).replace('Rp', 'Rp ')}
-              </div>
-              <div className="text-[10px] text-[#8A816F] font-mono">Margin per 1 gram</div>
             </div>
           </div>
         </div>
