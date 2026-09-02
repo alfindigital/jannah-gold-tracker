@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db/db';
 import { formatRupiah, formatRupiahJuta, formatGram, formatDateIndo, calculateNetProfit, getCleanPhoneNumber } from '../../services/calculationService';
@@ -64,6 +64,21 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
     paymentMethod: 'Tunai',
     notes: ''
   });
+
+  // Quick Sell: when navigated from InventoryTab with a pre-selected item,
+  // switch to the Sales tab, prefill the form, and open the modal automatically.
+  useEffect(() => {
+    if (quickSellItem) {
+      setReportSubTab('sales');
+      setSaleForm(prev => ({
+        ...prev,
+        inventoryId: quickSellItem.id,
+        sellPrice: (quickSellItem.totalBuyPrice || 0) + 75000,
+      }));
+      setShowSaleModal(true);
+      if (onClearQuickSell) onClearQuickSell();
+    }
+  }, [quickSellItem]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const selectedInventoryItem = inventory.find(i => i.id === Number(saleForm.inventoryId));
   const currentCost = selectedInventoryItem ? Number(selectedInventoryItem.totalBuyPrice) : 0;

@@ -88,7 +88,7 @@ export default function CrmTab() {
     return customerList.filter(c => {
       // Search
       const matchSearch = 
-        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (c.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (c.phone && c.phone.includes(searchQuery)) ||
         (c.address && c.address.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (c.notes && c.notes.toLowerCase().includes(searchQuery.toLowerCase()));

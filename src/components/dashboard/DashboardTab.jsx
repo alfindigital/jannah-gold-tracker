@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db/db';
-import { formatRupiah, formatRupiahJuta, formatJuta, formatGram, formatDateIndo, formatDateTimeIndo } from '../../services/calculationService';
+import { formatRupiahJuta, formatJuta, formatGram, formatDateIndo, formatDateTimeIndo } from '../../services/calculationService';
 import { 
   TrendingUp, 
   Layers, 
