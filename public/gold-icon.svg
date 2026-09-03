@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <rect width="512" height="512" rx="128" fill="#000000" />
-  <g transform="translate(136, 136)" stroke="#FFFFFF" stroke-width="16" stroke-linejoin="round" stroke-linecap="round">
-    <!-- Minimalist Architectural Ingot / Diamond Geometry -->
-    <path d="M120 20 L220 70 L120 120 L20 70 Z" fill="#FFFFFF" fill-opacity="0.15" />
-    <path d="M20 70 L120 120 L120 220 L20 170 Z" fill="#FFFFFF" fill-opacity="0.05" />
-    <path d="M120 120 L220 70 L220 170 L120 220 Z" fill="#FFFFFF" fill-opacity="0.25" />
-  </g>
-</svg>
