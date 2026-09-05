@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import Badge from '../common/Badge';
 
-export default function DashboardTab({ onNavigateTab, onOpenPriceModal, onOpenGoldPrices }) {
+export default function DashboardTab({ onNavigateTab, onOpenGoldPrices }) {
   const inventoryRaw = useLiveQuery(() => db.inventory.toArray(), []);
   const transactionsRaw = useLiveQuery(() => db.transactions.toArray(), []);
   const schedulesRaw = useLiveQuery(() => db.schedules.toArray(), []);
@@ -99,8 +99,9 @@ export default function DashboardTab({ onNavigateTab, onOpenPriceModal, onOpenGo
 
             {/* Card 4: Market Valuation (Imperial Gold Luster) */}
             <div 
-              onClick={onOpenPriceModal}
+              onClick={onOpenGoldPrices}
               className="p-4 rounded-3xl bg-gradient-to-br from-[#FFFDF5] via-[#FCF2D2] to-[#F8E5A7] border-2 border-[#E8BF48]/80 space-y-2 shadow-[0_4px_20px_rgba(232,191,72,0.18)] cursor-pointer hover:border-[#C79718] transition-all active-press"
+              title="Lihat & Kelola Harga Acuan Emas"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-extrabold text-[#8A5F0C] uppercase tracking-wider">Valuasi</span>

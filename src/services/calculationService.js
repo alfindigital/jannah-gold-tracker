@@ -109,3 +109,49 @@ export function getCleanPhoneNumber(phone) {
   }
   return clean;
 }
+
+export function generateWhatsAppReceipt(tx, customer = null) {
+  const notaId = `JG-${String(tx?.id || Date.now()).slice(-6)}`;
+  const dateStr = formatDateIndo(tx?.saleDate || new Date().toISOString());
+  const custName = tx?.customerName || customer?.name || 'Pelanggan Terhormat';
+  const itemTitle = tx?.itemTitle || 'Emas Batangan Fisik';
+  const weightStr = formatGram(tx?.weight || 0);
+  const priceStr = formatRupiah(tx?.sellPrice || 0);
+  const paymentMethod = tx?.paymentMethod || 'Tunai (COD)';
+  const location = tx?.deliveryLocation || tx?.location || customer?.address || 'Purbalingga';
+
+  return `*BUKTI TRANSAKSI RESMI — JANNAH GOLD*
+====================================
+*No. Nota* : ${notaId}
+*Tanggal*  : ${dateStr}
+*Pelanggan*: ${custName}
+*Lokasi*   : ${location}
+
+*RINCIAN TRANSAKSI:*
+• Produk   : ${itemTitle}
+• Gramasi  : ${weightStr}
+• Total    : ${priceStr}
+• Pembayaran: ${paymentMethod}
+
+*AKAD & JAMINAN MUTU:*
+✓ 100% Emas Fisik Asli & Terverifikasi
+✓ Serah Terima Tunai di Tempat (Yadan bi Yadin)
+✓ Ditimbang bersama di depan pembeli
+✓ Jaminan Layanan BUYBACK Tunai Resmi Jannah Gold
+
+_Jazakumullahu khairan wa barakallahu fiikum atas kepercayaannya berbelanja di Jannah Gold._
+------------------------------------
+*Jannah Gold Purbalingga*
+Layanan Emas Fisik COD & Buyback`;
+}
+
+export function sendReceiptWhatsApp(tx, customer = null) {
+  const phone = tx?.customerPhone || customer?.phone;
+  const cleanPhone = getCleanPhoneNumber(phone);
+  if (!cleanPhone) {
+    alert('Nomor WhatsApp pelanggan belum tersedia.');
+    return;
+  }
+  const message = generateWhatsAppReceipt(tx, customer);
+  window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
+}

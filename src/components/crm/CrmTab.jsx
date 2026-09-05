@@ -12,14 +12,16 @@ import {
   ChevronUp, 
   Trash2, 
   Edit3, 
-  Phone
+  Phone,
+  Receipt
 } from 'lucide-react';
 import Modal from '../common/Modal';
 import { 
   formatRupiah, 
   formatRupiahJuta, 
   formatGram, 
-  formatDateIndo 
+  formatDateIndo,
+  sendReceiptWhatsApp
 } from '../../services/calculationService';
 
 export default function CrmTab() {
@@ -392,6 +394,17 @@ export default function CrmTab() {
                                   {tx.paymentMethod === 'cash' ? 'Tunai' : tx.paymentMethod === 'transfer' ? 'Transfer Bank' : tx.paymentMethod || '-'}
                                 </span>
                               </div>
+                            )}
+
+                            {c.phone && (
+                              <button
+                                onClick={() => sendReceiptWhatsApp(tx, c)}
+                                className="w-full mt-1.5 py-1.5 px-2 bg-[#EAF3EA] text-[#1E5C27] border border-[#C2E0C7] rounded-xl text-[10px] font-display font-bold flex items-center justify-center gap-1 hover:bg-[#D8EBD9] active-press transition-all"
+                                title="Kirim Ulang Bukti Nota Resmi via WhatsApp"
+                              >
+                                <Receipt className="w-3 h-3 stroke-[2.2]" />
+                                <span>Kirim Nota Resmi WhatsApp</span>
+                              </button>
                             )}
                           </div>
                         ))}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, SCHEDULE_TYPE, SCHEDULE_STATUS } from '../../db/db';
-import { formatRupiahJuta, formatDateTimeIndo, getCleanPhoneNumber } from '../../services/calculationService';
+import { formatRupiah, formatRupiahJuta, formatDateTimeIndo, getCleanPhoneNumber } from '../../services/calculationService';
 import { 
   Plus, 
   MapPin, 
@@ -14,7 +14,7 @@ import {
 import Badge from '../common/Badge';
 import Modal from '../common/Modal';
 
-export default function ScheduleTab() {
+export default function ScheduleTab({ onConvertCodToSale }) {
   const [filterType, setFilterType] = useState('all');
   const [showModal, setShowModal] = useState(false);
 
@@ -71,11 +71,19 @@ export default function ScheduleTab() {
     });
   };
 
-  const handleUpdateStatus = async (id, currentStatus) => {
-    if (currentStatus === SCHEDULE_STATUS.PENDING) {
-      await db.schedules.update(id, { status: SCHEDULE_STATUS.ONGOING });
-    } else if (currentStatus === SCHEDULE_STATUS.ONGOING) {
-      await db.schedules.update(id, { status: SCHEDULE_STATUS.COMPLETED });
+  const handleUpdateStatus = async (item) => {
+    if (item.status === SCHEDULE_STATUS.PENDING) {
+      await db.schedules.update(item.id, { status: SCHEDULE_STATUS.ONGOING });
+    } else if (item.status === SCHEDULE_STATUS.ONGOING) {
+      await db.schedules.update(item.id, { status: SCHEDULE_STATUS.COMPLETED });
+      if (item.type === SCHEDULE_TYPE.COD && onConvertCodToSale) {
+        const wantConvert = window.confirm(
+          `Pengantaran COD ke "${item.contactName || 'Pelanggan'}" telah selesai!\n\nApakah Anda ingin langsung mencatat transaksi penjualan ke pembukuan dan memotong stok emas yang laku?`
+        );
+        if (wantConvert) {
+          onConvertCodToSale(item);
+        }
+      }
     }
   };
 
@@ -99,16 +107,36 @@ export default function ScheduleTab() {
     }
   };
 
-  const openWhatsApp = (phone, name = '') => {
-    const cleanPhone = getCleanPhoneNumber(phone);
+  const openWhatsApp = (item) => {
+    const cleanPhone = getCleanPhoneNumber(item?.contactPhone);
     if (!cleanPhone) {
       alert('Nomor WhatsApp belum diisi');
       return;
     }
-    const greeting = encodeURIComponent(
-      `Halo ${name || ''}, salam dari Jannah Gold...`
-    );
-    window.open(`https://wa.me/${cleanPhone}?text=${greeting}`, '_blank');
+
+    let message = '';
+    if (item.type === SCHEDULE_TYPE.RESTOCK) {
+      message = `Halo ${item.contactName || 'Supplier'}, salam dari Jannah Gold.
+
+Mau konfirmasi rencana kulakan/restock emas kami:
+🗓️ Waktu: ${formatDateTimeIndo(item.date, item.time)}
+💰 Budget Siap: ${formatRupiah(item.targetAmount)}
+
+Mohon info kesiapan stok emas batangan fisik ya. Terima kasih!`;
+    } else {
+      message = `Halo Kak ${item.contactName || ''}, salam dari Jannah Gold.
+
+Mengingatkan janji temu COD Emas Fisik kita:
+🗓️ Waktu: ${formatDateTimeIndo(item.date, item.time)}
+📍 Lokasi COD: ${item.location || 'Purbalingga'}
+💰 Estimasi Bayar: ${formatRupiah(item.targetAmount)}
+
+InsyaAllah tim kami akan hadir tepat waktu membawa emas fisik dan timbangan digital untuk dicek bersama di tempat (Yadan bi Yadin).
+
+Mohon kabari jika ada perubahan ya Kak. Terima kasih!`;
+    }
+
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   return (
@@ -210,9 +238,9 @@ export default function ScheduleTab() {
                   <div className="flex items-center gap-2">
                     {item.contactPhone && (
                       <button
-                        onClick={() => openWhatsApp(item.contactPhone, item.contactName)}
+                        onClick={() => openWhatsApp(item)}
                         className="p-2 text-[#1E5C27] bg-[#EAF3EA] hover:bg-[#D8EBD9] border border-[#C2E0C7] rounded-xl active-press transition-all"
-                        title="Kirim WhatsApp"
+                        title="Kirim WhatsApp Pengingat"
                       >
                         <MessageSquare className="w-4 h-4 stroke-[2.2]" />
                       </button>
@@ -226,13 +254,25 @@ export default function ScheduleTab() {
 
                   <div className="flex items-center gap-1.5">
                     {item.status === SCHEDULE_STATUS.COMPLETED ? (
-                      <div className="px-3 py-1.5 rounded-xl text-xs font-display font-bold bg-[#E8E2D5] text-[#8A816F] border border-[#DDD5C5] cursor-not-allowed flex items-center gap-1 opacity-75 select-none">
-                        <Check className="w-3.5 h-3.5 stroke-[2.5] text-[#8A816F]" />
-                        <span>Selesai</span>
+                      <div className="flex items-center gap-1">
+                        <div className="px-2.5 py-1.5 rounded-xl text-xs font-display font-bold bg-[#E8E2D5] text-[#8A816F] border border-[#DDD5C5] cursor-not-allowed flex items-center gap-1 opacity-75 select-none">
+                          <Check className="w-3.5 h-3.5 stroke-[2.5] text-[#8A816F]" />
+                          <span>Selesai</span>
+                        </div>
+                        {item.type === SCHEDULE_TYPE.COD && onConvertCodToSale && (
+                          <button
+                            onClick={() => onConvertCodToSale(item)}
+                            className="px-2.5 py-1.5 rounded-xl text-xs font-display font-bold bg-[#FAF3DE] text-[#876618] border border-[#D4AF37]/60 hover:bg-[#F2E3B8] transition-all flex items-center gap-1 active-press shadow-xs"
+                            title="Catat sebagai Penjualan Resmi"
+                          >
+                            <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                            <span>Catat Laku</span>
+                          </button>
+                        )}
                       </div>
                     ) : (
                       <button
-                        onClick={() => handleUpdateStatus(item.id, item.status)}
+                        onClick={() => handleUpdateStatus(item)}
                         className={`px-3 py-1.5 rounded-xl text-xs font-display font-bold transition-all active-press flex items-center gap-1 ${
                           item.status === SCHEDULE_STATUS.ONGOING
                             ? 'bg-[#1B1814] text-[#E5C378] border border-[#D4AF37]/60 shadow-xs ring-1 ring-[#D4AF37]/40'

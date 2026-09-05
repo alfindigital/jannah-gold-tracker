@@ -13,9 +13,6 @@ import CrmTab from './components/crm/CrmTab';
 import FinancialReportTab from './components/reports/FinancialReportTab';
 import GoldPricesTab from './components/goldprices/GoldPricesTab';
 
-// Modals
-import GoldPriceModal from './components/dashboard/GoldPriceModal';
-
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -94,7 +91,6 @@ function getTabFromHash() {
 
 function MainApp() {
   const [activeTab, setActiveTabState] = useState(() => getTabFromHash());
-  const [showPriceModal, setShowPriceModal] = useState(false);
   const [quickSellItem, setQuickSellItem] = useState(null);
 
   // Sync state -> URL Hash
@@ -138,6 +134,16 @@ function MainApp() {
     setActiveTab('reports');
   };
 
+  const handleConvertCodToSale = (codItem) => {
+    setQuickSellItem({
+      customerName: codItem.contactName || '',
+      customerPhone: codItem.contactPhone || '',
+      sellPrice: Number(codItem.targetAmount) || 0,
+      notes: codItem.notes ? `Dari COD ${codItem.location || ''}: ${codItem.notes}` : `Dari COD: ${codItem.location || ''}`
+    });
+    setActiveTab('reports');
+  };
+
   return (
     <div className="min-h-screen bg-[#F6F3EC] text-[#1B1814] flex flex-col font-sans">
       {/* Top Header with Quick Action Buttons */}
@@ -152,14 +158,13 @@ function MainApp() {
         {activeTab === 'dashboard' && (
           <DashboardTab 
             onNavigateTab={setActiveTab} 
-            onOpenPriceModal={() => setShowPriceModal(true)} 
             onOpenGoldPrices={() => setActiveTab('gold-prices')}
           />
         )}
 
         {/* 2. Jadwal (Schedule) */}
         {activeTab === 'schedule' && (
-          <ScheduleTab />
+          <ScheduleTab onConvertCodToSale={handleConvertCodToSale} />
         )}
 
         {/* 3. Stok (Inventory) */}
@@ -190,12 +195,6 @@ function MainApp() {
       <BottomNav 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
-      />
-
-      {/* Gold Price Config Modal */}
-      <GoldPriceModal 
-        isOpen={showPriceModal} 
-        onClose={() => setShowPriceModal(false)} 
       />
     </div>
   );

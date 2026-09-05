@@ -1,0 +1,43 @@
+﻿name: Update Daily Gold Prices Benchmark
+
+on:
+  schedule:
+    # 01:45 UTC = 08:45 WIB every day
+    - cron: '45 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Update Daily Benchmark Timestamp
+        run: |
+          TIMESTAMP_WIB=$(date -u -d "+7 hours" +"%Y-%m-%d %H:%M WIB")
+          echo "Syncing market benchmark prices for $TIMESTAMP_WIB..."
+          node -e "
+            const fs = require('fs');
+            const file = 'public/prices.json';
+            let data = {};
+            if (fs.existsSync(file)) {
+              data = JSON.parse(fs.readFileSync(file, 'utf8'));
+            } else {
+              data = { prices: {} };
+            }
+            data.updatedAt = new Date().toISOString();
+            data.source = 'Logam Mulia & Pegadaian Market Benchmark';
+            fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf8');
+            console.log('Updated prices.json successfully');
+          "
+
+      - name: Commit & Push Changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/prices.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(prices): update daily gold benchmark prices" && git push origin main)

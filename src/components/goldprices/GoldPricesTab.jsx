@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db/db';
-import { Pencil, Check, X, ArrowLeft } from 'lucide-react';
+import { Pencil, Check, X, ArrowLeft, RefreshCw } from 'lucide-react';
 
 const BRANDS = [
   { key: 'antam',       label: 'Antam',        jualKey: 'antam1g',         buybackKey: 'antam_buyback' },
@@ -32,6 +32,45 @@ export default function GoldPricesTab({ onBack }) {
   const [editJual, setEditJual] = useState('');
   const [editBuyback, setEditBuyback] = useState('');
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState(null);
+
+  const handleSyncOnline = async () => {
+    try {
+      setSyncing(true);
+      setSyncMsg(null);
+      const res = await fetch(`./prices.json?t=${Date.now()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data && data.prices) {
+        const today = new Date().toISOString().split('T')[0];
+        const updated = {
+          ...prices,
+          antam1g: data.prices.antam1g || prices.antam1g,
+          antam_buyback: data.prices.antam_buyback || prices.antam_buyback,
+          ubs1g: data.prices.ubs1g || prices.ubs1g,
+          ubs_buyback: data.prices.ubs_buyback || prices.ubs_buyback,
+          galeri24_1g: data.prices.galeri24_1g || prices.galeri24_1g,
+          galeri24_buyback: data.prices.galeri24_buyback || prices.galeri24_buyback,
+          hartadinata1g: data.prices.hartadinata1g || prices.hartadinata1g,
+          hartadinata_buyback: data.prices.hartadinata_buyback || prices.hartadinata_buyback,
+          archi1g: data.prices.archi1g || prices.archi1g,
+          archi_buyback: data.prices.archi_buyback || prices.archi_buyback,
+          lastUpdated: today
+        };
+        await db.settings.put({ key: 'gold_price_live', ...updated });
+        setPrices(updated);
+        setSyncMsg('Harga online berhasil disinkronkan!');
+        setTimeout(() => setSyncMsg(null), 4000);
+      }
+    } catch (err) {
+      console.warn('Sync online warning:', err);
+      setSyncMsg('Gagal mengambil data online. Cek koneksi.');
+      setTimeout(() => setSyncMsg(null), 4000);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   useEffect(() => {
     if (settings) {
@@ -82,19 +121,37 @@ export default function GoldPricesTab({ onBack }) {
 
   return (
     <div className="space-y-4 pb-2">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onBack}
-          className="p-2 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3] hover:bg-[#EBE5D8] text-[#1B1814] transition-all active-press"
-          title="Kembali"
-        >
-          <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
-        </button>
-        <div>
-          <h1 className="text-sm font-display font-black text-[#1B1814] uppercase tracking-wide">Harga Emas Acuan</h1>
-          <p className="text-[11px] font-mono text-[#8A816F]">Diperbarui: {lastUpdated} · Ketuk ✎ untuk ubah</p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="p-2 rounded-2xl bg-[#F2EDE2] border border-[#E5DFD3] hover:bg-[#EBE5D8] text-[#1B1814] transition-all active-press"
+            title="Kembali"
+          >
+            <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
+          </button>
+          <div>
+            <h1 className="text-sm font-display font-black text-[#1B1814] uppercase tracking-wide">Harga Emas Acuan</h1>
+            <p className="text-[11px] font-mono text-[#8A816F]">Diperbarui: {lastUpdated} · Ketuk ✎ untuk ubah</p>
+          </div>
         </div>
+
+        <button
+          onClick={handleSyncOnline}
+          disabled={syncing}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-[#1B1814] text-[#E5C378] text-xs font-display font-bold hover:bg-[#2E2820] active-press shadow-xs ring-1 ring-[#D4AF37]/40 transition-all shrink-0"
+          title="Tarik acuan harga benchmark pasar terkini"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 stroke-[2.5] ${syncing ? 'animate-spin' : ''}`} />
+          <span>{syncing ? 'Sinkron...' : 'Tarik Online'}</span>
+        </button>
       </div>
+
+      {syncMsg && (
+        <div className="p-2.5 rounded-2xl bg-[#FAF2DA] border border-[#E8CD85] text-xs font-mono text-[#876618] text-center shadow-xs animate-in fade-in duration-200">
+          {syncMsg}
+        </div>
+      )}
 
       <div className="rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] overflow-hidden shadow-xs">
         <div className="grid items-center px-4 py-2.5 bg-[#F2EDE2] border-b border-[#E5DFD3]" style={{gridTemplateColumns:'1fr 100px 100px 44px'}}>

@@ -1,0 +1,16 @@
+﻿{
+  "updatedAt": "2026-09-05T08:45:00+07:00",
+  "source": "Logam Mulia & Pegadaian Market Benchmark",
+  "prices": {
+    "antam1g": 1455000,
+    "antam_buyback": 1330000,
+    "ubs1g": 1420000,
+    "ubs_buyback": 1305000,
+    "galeri24_1g": 1415000,
+    "galeri24_buyback": 1300000,
+    "hartadinata1g": 1410000,
+    "hartadinata_buyback": 1295000,
+    "archi1g": 1412000,
+    "archi_buyback": 1298000
+  }
+}

@@ -1,14 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../db/db';
-import { formatRupiah, formatRupiahJuta, formatGram, formatDateIndo, calculateNetProfit, getCleanPhoneNumber } from '../../services/calculationService';
-import { exportFinancialReportToExcel } from '../../services/exportService';
+import { 
+  formatRupiah, 
+  formatRupiahJuta, 
+  formatGram, 
+  formatDateIndo, 
+  calculateNetProfit, 
+  getCleanPhoneNumber,
+  sendReceiptWhatsApp 
+} from '../../services/calculationService';
+import { 
+  exportFinancialReportToExcel, 
+  exportDatabaseJSON, 
+  importDatabaseJSON 
+} from '../../services/exportService';
 import { 
   Download, 
   Receipt, 
   ArrowRightLeft, 
   MessageSquare,
-  Plus
+  Plus,
+  Database,
+  UploadCloud,
+  FileSpreadsheet
 } from 'lucide-react';
 import Modal from '../common/Modal';
 
@@ -65,15 +80,18 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
     notes: ''
   });
 
-  // Quick Sell: when navigated from InventoryTab with a pre-selected item,
+  // Quick Sell / Convert COD: when navigated with a pre-selected item,
   // switch to the Sales tab, prefill the form, and open the modal automatically.
   useEffect(() => {
     if (quickSellItem) {
       setReportSubTab('sales');
       setSaleForm(prev => ({
         ...prev,
-        inventoryId: quickSellItem.id,
-        sellPrice: (quickSellItem.totalBuyPrice || 0) + 75000,
+        inventoryId: quickSellItem.id || prev.inventoryId || '',
+        customerName: quickSellItem.customerName || prev.customerName || '',
+        customerPhone: quickSellItem.customerPhone || prev.customerPhone || '',
+        sellPrice: quickSellItem.sellPrice || (quickSellItem.totalBuyPrice ? quickSellItem.totalBuyPrice + 75000 : prev.sellPrice || 0),
+        notes: quickSellItem.notes || prev.notes || ''
       }));
       setShowSaleModal(true);
       if (onClearQuickSell) onClearQuickSell();
@@ -141,6 +159,65 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
     });
 
     setShowSaleModal(false);
+
+    // Prompt otomatis kirim bukti nota resmi via WhatsApp
+    if (customerPhone) {
+      setTimeout(() => {
+        const sendNow = window.confirm(
+          `Transaksi Penjualan Berhasil Disimpan!\n\nKirim nota bukti transaksi resmi via WhatsApp ke ${customerName || 'Pembeli'} sekarang?`
+        );
+        if (sendNow) {
+          sendReceiptWhatsApp({
+            id: Date.now(),
+            itemTitle: selectedInventoryItem.title,
+            weight: currentWeight,
+            customerName: customerName,
+            customerPhone: customerPhone,
+            saleDate: saleForm.saleDate,
+            sellPrice: Number(saleForm.sellPrice),
+            paymentMethod: saleForm.paymentMethod
+          });
+        }
+      }, 300);
+    }
+  };
+
+  const fileInputRef = useRef(null);
+  const [isBackingUp, setIsBackingUp] = useState(false);
+
+  const handleExportJSON = async () => {
+    try {
+      setIsBackingUp(true);
+      const res = await exportDatabaseJSON(db);
+      alert(`Cadangan Database Berhasil Diunduh!\nTotal ${res.count} data inventori & transaksi telah tersimpan di file JSON.`);
+    } catch (err) {
+      alert(`Gagal mencadangkan data: ${err.message}`);
+    } finally {
+      setIsBackingUp(false);
+    }
+  };
+
+  const handleImportJSON = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const confirmRestore = window.confirm(
+      'PERINGATAN PEMULIHAN:\n\nMemulihkan data dari file JSON akan menggantikan seluruh database lokal saat ini.\n\nApakah Anda yakin ingin melanjutkan?'
+    );
+
+    if (!confirmRestore) {
+      e.target.value = '';
+      return;
+    }
+
+    try {
+      const res = await importDatabaseJSON(file, db);
+      alert(`Data Berhasil Dipulihkan!\n\n- ${res.counts.inventory} Item Stok\n- ${res.counts.transactions} Transaksi\n- ${res.counts.customers} Pelanggan\n- ${res.counts.schedules} Jadwal`);
+    } catch (err) {
+      alert(`Gagal memulihkan data: ${err.message}`);
+    } finally {
+      e.target.value = '';
+    }
   };
 
   const openWhatsApp = (phone, name = '') => {
@@ -323,6 +400,60 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
               </div>
             </div>
           </div>
+
+          {/* Backup & Data Protection Section */}
+          <div className="p-4 rounded-3xl bg-[#FAF8F5] border border-[#E5DFD3] space-y-3 shadow-xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Database className="w-4 h-4 text-[#A27B2C] stroke-[2.2]" />
+                <h3 className="text-xs font-display font-bold uppercase tracking-wider text-[#1B1814]">
+                  Cadangan & Keamanan Data
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#EAF3EA] text-[#1E5C27] border border-[#C2E0C7] font-semibold">
+                Anti-Hilang
+              </span>
+            </div>
+
+            <p className="text-[11px] text-[#7A7264] leading-relaxed">
+              Data transaksi & stok Anda tersimpan lokal di memori HP. Unduh cadangan JSON secara berkala agar tidak hilang saat berganti perangkat atau membersihkan browser.
+            </p>
+
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                onClick={handleExportJSON}
+                disabled={isBackingUp}
+                className="py-2.5 px-3 rounded-2xl bg-[#1B1814] text-[#E5C378] text-xs font-display font-bold flex items-center justify-center gap-1.5 hover:bg-[#2E2820] active-press shadow-xs ring-1 ring-[#D4AF37]/50 transition-all"
+              >
+                <Download className="w-3.5 h-3.5" />
+                <span>{isBackingUp ? 'Menyimpan...' : 'Cadangkan JSON'}</span>
+              </button>
+
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="py-2.5 px-3 rounded-2xl bg-[#F2EDE2] text-[#1B1814] text-xs font-display font-bold border border-[#E5DFD3] flex items-center justify-center gap-1.5 hover:bg-[#EAE5D8] active-press transition-all"
+              >
+                <UploadCloud className="w-3.5 h-3.5 text-[#876618]" />
+                <span>Pulihkan JSON</span>
+              </button>
+            </div>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImportJSON}
+              accept=".json"
+              className="hidden"
+            />
+
+            <button
+              onClick={handleExportExcel}
+              className="w-full py-2.5 px-3 rounded-2xl bg-[#FAF2DA] text-[#876618] border border-[#E8CD85] text-xs font-display font-bold flex items-center justify-center gap-1.5 hover:bg-[#F5E8C3] active-press transition-all"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-[#876618]" />
+              <span>Unduh Laporan Lengkap 4-Sheet Excel (.xlsx)</span>
+            </button>
+          </div>
         </div>
       )}
 
@@ -379,18 +510,28 @@ export default function FinancialReportTab({ quickSellItem, onClearQuickSell }) 
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-[#E5DFD3] flex items-center justify-between text-xs">
-                    <div className="text-[11px] text-[#7A7264] font-mono tabular-nums">
+                  <div className="pt-2 border-t border-[#E5DFD3] flex items-center justify-between text-xs gap-2">
+                    <div className="text-[11px] text-[#7A7264] font-mono tabular-nums truncate">
                       Terjual: {formatRupiahJuta(tx.sellPrice)} | Modal: {formatRupiahJuta(tx.costPrice)}
                     </div>
                     {tx.customerPhone && (
-                      <button
-                        onClick={() => openWhatsApp(tx.customerPhone, tx.customerName)}
-                        className="p-2 text-[#1E5C27] bg-[#EAF3EA] hover:bg-[#D8EBD9] border border-[#C2E0C7] rounded-xl active-press transition-all"
-                        title="Kirim WhatsApp"
-                      >
-                        <MessageSquare className="w-4 h-4 stroke-[2.2]" />
-                      </button>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          onClick={() => sendReceiptWhatsApp(tx)}
+                          className="px-2.5 py-1.5 text-[10px] font-display font-bold text-[#1E5C27] bg-[#EAF3EA] hover:bg-[#D8EBD9] border border-[#C2E0C7] rounded-xl active-press transition-all flex items-center gap-1"
+                          title="Kirim Nota Transaksi Resmi via WhatsApp"
+                        >
+                          <Receipt className="w-3.5 h-3.5 stroke-[2.2]" />
+                          <span>Kirim Nota</span>
+                        </button>
+                        <button
+                          onClick={() => openWhatsApp(tx.customerPhone, tx.customerName)}
+                          className="p-1.5 text-[#6E604A] bg-[#F2EDE2] hover:bg-[#EAE2D2] border border-[#E5DFD3] rounded-xl active-press transition-all"
+                          title="Chat WhatsApp"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5 stroke-[2.2]" />
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
