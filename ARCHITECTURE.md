@@ -1,101 +1,116 @@
-# Architecture Document — Jannah Gold PWA Tracker
+﻿# Architecture Document — Jannah Gold PWA Tracker
+
+> **Status**: Verified Production Live  
+> **Production URL**: https://alfindigital.github.io/jannah-gold-tracker/  
+> **Repository**: https://github.com/alfindigital/jannah-gold-tracker (branch: main)
+
+---
 
 ## 1. Tech Stack
-- **Frontend Core**: React 18 (SPA with hooks & functional components), Vite (High-speed build tool & HMR).
+- **Frontend Core**: React 18 (SPA with hooks & functional components), Vite v6.4+ dengan Rollup `manualChunks` code-splitting.
 - **Styling & UI**: Tailwind CSS 3.4, PostCSS, Lucide React (featherweight luxury icon set).
-- **State & Database**: Dexie.js (IndexedDB wrapper) with `dexie-react-hooks` for reactive, zero-latency local queries.
-- **Charts & Visuals**: Recharts (smooth financial trend lines) + Canvas Confetti (celebration feedback on sales recorded).
-- **Data Export & Reporting**: XLSX (SheetJS) for seamless Excel export & JSON import/export.
-- **PWA Ecosystem**: Service Worker (`sw.js`), Web App Manifest (`manifest.json`), responsive viewport meta tags.
+- **Routing**: Hash-based URL routing (`window.location.hash`) tanpa overhead library eksternal, mendukung tombol browser back/forward dan refresh aman di GitHub Pages.
+- **State & Database**: Dexie.js (IndexedDB wrapper) dengan `dexie-react-hooks` untuk reaktifitas instan (`useLiveQuery`).
+- **Visual Micro-Interactions**: Canvas Confetti saat pencatatan transaksi berhasil.
+- **Data Export & Portability**: XLSX (SheetJS) untuk ekspor 4-sheet Excel & JSON import/export utuh.
+- **PWA Ecosystem**: Service Worker (`public/sw.js`, Network-First caching `jannah-gold-v3`), Web App Manifest (`public/manifest.json`), viewport meta tags responsif.
 
-## 2. Architecture & Layering Flow
+---
+
+## 2. Arsitektur Komponen & Alur Kerja
+
 ```
 +-------------------------------------------------------------------------+
 |                         📱 USER INTERFACE LAYER                         |
-|   - Bottom Navigation Bar (4 Tab: Finansial, Inventori, CRM, COD)        |
-|   - Reusable UI Components (Stat Cards, Modals, Forms, Badges, Tables)   |
+|   - Header: Quick Action Buttons (Tambah Stok, Jual Emas)               |
+|   - Bottom Navigation Bar (5 Tab: Dashboard, Jadwal, Stok, CRM, Laporan)|
+|   - Dedicated Sub-Page: Harga Emas Acuan (/#/gold-prices)               |
+|   - Reusable UI Components: Modal.jsx, Badge.jsx                        |
 +------------------------------------+------------------------------------+
                                      | (Reactive hooks: useLiveQuery)
 +------------------------------------v------------------------------------+
 |                      🧠 BUSINESS LOGIC & SERVICE LAYER                  |
-|   - Financial Calculations (Net Profit, ROI, Inventory Valuation)       |
-|   - Gold Price Estimator (Antam/UBS/Spot vs Buyback Margin)             |
-|   - Inventory Status Lifecycle (Ready -> Booked -> Sold)                |
-|   - Schedule Dispatcher (Today's COD alert, Kulakan planner)            |
-|   - Export Service (XLSX generator, JSON Backup/Restore)                |
+|   - calculationService.js (Net Profit, Margin %, Format, WA Receipt)    |
+|   - exportService.js (4-Sheet XLSX Generator, JSON Backup & Restore)    |
+|   - Inventory Lifecycle (Ready -> Booked -> Sold)                       |
+|   - Schedule Dispatcher (COD Workflow, Auto Convert to Sale)            |
+|   - Online Price Ingestion (prices.json + GitHub Actions Cron)          |
 +------------------------------------+------------------------------------+
                                      | (IndexedDB Transaction APIs)
 +------------------------------------v------------------------------------+
 |                       💾 LOCAL DATABASE LAYER (DEXIE.JS)                |
-|   - Table: inventory (items, grammage, buy_price, status)               |
-|   - Table: transactions (sales, customer_id, sell_price, profit)        |
-|   - Table: customers (name, phone, address, total_grams_bought)         |
-|   - Table: schedules (cod_appointments, restocking_trips)              |
-|   - Table: settings (live_gold_price, app_preferences)                  |
+|   - Table: inventory (stok, gramasi, modal beli HPP, status)            |
+|   - Table: transactions (penjualan, customer, harga jual, laba bersih)  |
+|   - Table: customers (nama, nomor WA, alamat, LTV, total gram)          |
+|   - Table: schedules (janji COD, belanja kulakan, status)               |
+|   - Table: settings (acuan harga 5 brand, preferensi)                   |
 +-------------------------------------------------------------------------+
 ```
 
-## 3. Folder Structure
+---
+
+## 3. Struktur Berkas Sebenarnya (Codebase Structure)
+
 ```
 pwa-gold-tracker/
-├── PRD.md                  # Product Requirements Document
-├── ARCHITECTURE.md         # System Architecture & Flow
-├── DESIGN.md               # Design System, Tokens, Component Specs
-├── SCHEMA.md               # Database Table Schemas & Indexes
-├── RULES.md                # Engineering Standards & Guardrails
-├── index.html              # PWA Entry HTML with viewport & manifest links
-├── manifest.json           # Web App Manifest for mobile installation
-├── package.json            # Node dependencies and scripts
-├── vite.config.js          # Vite configuration with PWA bundling
-├── tailwind.config.js      # Tailwind theme tokens (Gold/Champagne/Sand)
-├── postcss.config.js       # PostCSS plugins
+├── HANDOVER.md                 # Salinan lokal master handover & hindsight
+├── ARCHITECTURE.md             # Dokumen arsitektur sistem terkini
+├── PRD.md                      # Product Requirements Document
+├── SCHEMA.md                   # Database Table Schemas & Indexes
+├── RULES.md                    # Engineering Standards & Guardrails
+├── index.html                  # PWA Entry HTML with viewport & manifest links
+├── package.json                # Node dependencies and build scripts
+├── vite.config.js              # Vite configuration with Rollup code-splitting
+├── tailwind.config.js          # Tailwind luxury gold theme tokens
+├── postcss.config.js           # PostCSS configuration
+├── vercel.json                 # Optional SPA rewrite configuration
 ├── public/
-│   ├── icon-192.png        # Mobile home screen icon (192px)
-│   ├── icon-512.png        # Splash screen icon (512px)
-│   └── sw.js               # Service Worker for offline asset caching
+│   ├── manifest.json           # Web App Manifest for mobile installation
+│   ├── sw.js                   # Service Worker (Network-First jannah-gold-v3)
+│   ├── logo.png                # App icon 512px
+│   └── prices.json             # Acuan harga pasar benchmark harian
 └── src/
-    ├── main.jsx            # React root bootstrap
-    ├── App.jsx             # Main App layout & Tab Router
+    ├── main.jsx                # React root bootstrap
+    ├── App.jsx                 # Main App layout, Hash Router, & State Bus
+    ├── index.css               # Global CSS & luxury typography styling
     ├── db/
-    │   ├── db.js           # Dexie database instance & table definitions
-    │   └── seed.js         # Realistic initial sample data
-    ├── components/
-    │   ├── layout/
-    │   │   ├── Header.jsx           # App top bar with Live Gold Price ticker
-    │   │   └── BottomNav.jsx        # Mobile thumb-friendly bottom nav
-    │   ├── dashboard/
-    │   │   ├── MetricCards.jsx      # Net profit, active modal, valuation
-    │   │   ├── GoldPriceWidget.jsx  # Today's gold price editor & reference
-    │   │   ├── TodayAgendaAlert.jsx # Urgent COD tasks for today
-    │   │   └── ProfitChart.jsx      # Visual trend chart
-    │   ├── inventory/
-    │   │   ├── InventoryList.jsx    # Stock cards with filter & search
-    │   │   ├── AddStockModal.jsx    # Form for adding gold stock
-    │   │   └── StockDetailModal.jsx # Detail card & Quick-sell trigger
-    │   ├── crm/
-    │   │   ├── SalesList.jsx        # Sales transactions table/cards
-    │   │   ├── RecordSaleModal.jsx  # Sell item form with profit calculator
-    │   │   ├── CustomerList.jsx     # CRM database + WhatsApp direct chat
-    │   │   └── ExportButton.jsx     # 1-click Excel export trigger
-    │   ├── schedule/
-    │   │   ├── CodScheduleList.jsx  # COD Delivery tasks + Maps shortcut
-    │   │   ├── AddCodModal.jsx      # New COD schedule form
-    │   │   ├── RestockList.jsx      # Kulakan shopping planner
-    │   │   └── AddRestockModal.jsx  # New restocking schedule form
-    │   └── common/
-    │       ├── Badge.jsx            # Status badges (Ready, Sold, Pending)
-    │       ├── Modal.jsx            # Reusable slide-up sheet / modal
-    │       └── Toast.jsx            # Notification alerts
+    │   ├── db.js               # Dexie database instance & table definitions
+    │   └── seed.js             # Realistic Indonesian sample seed data
     ├── services/
-    │   ├── exportService.js         # XLSX builder & downloader
-    │   └── calculationService.js    # Financial math, FIFO margin, totals
-    └── styles/
-        └── index.css                # Global CSS & luxury typography styling
+    │   ├── calculationService.js # Financial math, formatting, WA receipt
+    │   └── exportService.js      # 4-sheet Excel generator & JSON backup/restore
+    └── components/
+        ├── common/
+        │   ├── Badge.jsx       # Status badge (Ready, Sold, Pending, dll.)
+        │   └── Modal.jsx       # Reusable accessible slide-up modal
+        ├── layout/
+        │   ├── Header.jsx      # Top header with quick action buttons
+        │   └── BottomNav.jsx   # 5-tab thumb-friendly bottom navigation
+        ├── dashboard/
+        │   └── DashboardTab.jsx # 4 Bento cards, stok terbaru, jadwal, mini price table
+        ├── goldprices/
+        │   └── GoldPricesTab.jsx # 5-brand prices table with inline edit & online sync
+        ├── schedule/
+        │   └── ScheduleTab.jsx   # COD & restock agenda with auto-convert to sale
+        ├── inventory/
+        │   └── InventoryTab.jsx  # Inventory catalog, filters, add stock modal, quick sell
+        ├── crm/
+        │   └── CrmTab.jsx        # Customer CRM, LTV, order history, resend WA receipt
+        └── reports/
+            └── FinancialReportTab.jsx # PnL, sales list, WA receipt, Excel/JSON backup
 ```
 
-## 4. Third-Party Tools & Libraries
-- **Lucide-React**: Elegant, minimal vector icons.
-- **Dexie**: High-performance indexedDB browser engine.
-- **SheetJS (xlsx)**: Client-side Excel binary generation.
-- **Recharts**: Responsive SVG charts for financial trend analysis.
-- **Canvas-Confetti**: Haptic/visual delight reward when sales are recorded.
+---
+
+## 4. Code Splitting & Performa Bundling
+
+Dikonfigurasi pada `vite.config.js`:
+- `vendor-react`: `['react', 'react-dom']`
+- `vendor-db`: `['dexie', 'dexie-react-hooks']`
+- `vendor-icons`: `['lucide-react']`
+- `vendor-xlsx`: `['xlsx']` (dipisahkan khusus ~283 kB)
+
+**Ukuran Hasil Build**:
+- `index-*.js`: **95.01 kB** (gzip: **21.73 kB**) ➔ First-paint instan di HP!
+- `vendor-slRwBf2R.js`: **255.65 kB** (React + Dexie + Lucide)
+- `vendor-xlsx-*.js`: **283.10 kB** (SheetJS di-load hanya saat laporan diakses)
