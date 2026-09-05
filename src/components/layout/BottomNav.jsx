@@ -36,7 +36,7 @@ export default function BottomNav({ activeTab, setActiveTab }) {
       <div className="max-w-sm mx-auto flex items-center justify-around px-2">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
+          const isActive = activeTab === tab.id || (tab.id === 'dashboard' && activeTab === 'gold-prices');
 
           return (
             <button
